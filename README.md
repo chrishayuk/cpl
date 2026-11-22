@@ -55,12 +55,12 @@ That puts `cpl` and `cpl-lsp` in `~/.cargo/bin`. Then:
 cpl -e "Write['Hello, world!*n']"
 ```
 
-For Visual Studio Code, download `cpl-language-0.1.0.vsix` from the
-[v0.1.0 release](https://github.com/chrishayuk/cpl/releases/tag/v0.1.0)
+For Visual Studio Code, download `cpl-language-0.1.1.vsix` from the
+[v0.1.1 release](https://github.com/chrishayuk/cpl/releases/tag/v0.1.1)
 and install it:
 
 ```bash
-code --install-extension cpl-language-0.1.0.vsix
+code --install-extension cpl-language-0.1.1.vsix
 ```
 
 To build the extension yourself instead, see
