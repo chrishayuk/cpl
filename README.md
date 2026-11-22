@@ -34,7 +34,7 @@ the manual prints the first recursive call as `HCF m, n]`.
 - **New to CPL?** Start with the [tutorial](tutorial/01-introduction.md):
   19 chapters, from hello world to LH functions.
 - **Want something to run?** There are [73 example programs](#examples),
-  ten of them taken from the documents of 1963 to 1966.
+  nine of them taken from the documents of 1963 to 1966.
 - **Want the 1966 program?** [Appendix 1](appendix1/README.md): the one
   large CPL program in the documents, run here, slips and all.
 - **No terminal handy?** The [browser playground](#in-the-browser) runs the
