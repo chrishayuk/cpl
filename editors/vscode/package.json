@@ -2,7 +2,7 @@
   "name": "cpl-language",
   "displayName": "CPL",
   "description": "Syntax highlighting, a language server and a run button for CPL, the Combined Programming Language of 1962-66 and the ancestor of BCPL, B and C.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "chrishayuk",
   "license": "Apache-2.0",
   "private": true,

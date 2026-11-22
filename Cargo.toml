@@ -1,6 +1,6 @@
 [package]
 name = "cpl"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "Apache-2.0"
 description = "CPL (Combined Programming Language, Cambridge and London 1962-66): the ancestor of BCPL, B and C, implemented from the 1966 Working Papers"
