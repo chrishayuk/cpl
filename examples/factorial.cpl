@@ -1,10 +1,15 @@
 || The example functions of "The Main Features of CPL" (1963), section 29,
-|| written in the notation of the 1966 Reference Manual.
+|| written in the notation of the 1966 Reference Manual: let for function,
+|| value of and result is for result of and result :=, and no type for
+|| the local variables, which the paper declares real (real is what they
+|| get anyway). The paper's Exp is called Exp1 here, so as not to hide the
+|| basic function Exp. The stopping test t < 1@-8 is the paper's.
+|| (Up to version 0.1.1 it was t << 1, which changed the algorithm.)
 
 || Exp sums a power series. Note the simultaneous assignment.
 let Exp1[x] = value of
    $( let s, t, r = 0, 1, 1
-      s, t, r := s + t, t x/r, r + 1 repeat until t << 1
+      s, t, r := s + t, t x/r, r + 1 repeat until t < 1@-8
       result is s $)
 
 || Fact1 is "a recursive function for computing a factorial" ...

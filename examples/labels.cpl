@@ -1,11 +1,12 @@
 || Labels are data items (Reference Manual 9.3): they can be assigned,
 || passed as parameters, and jumped to from inside other activations.
 
-|| The example of 9.3.2. "Each call of R ultimately has its two label
-|| parameters specifying the same point N in two different activations
-|| of R", and the jump works its way back out through every second one:
-|| "the effect of executing R[10, Even, Odd] is to jump to the
-|| destination Even, whereas R[9, Even, Odd] jumps to Odd."
+|| The example of 9.3.2, with rec for recursive. "Note that each call of
+|| R ultimately has its two label parameters specifying the same point N
+|| in two different activations of R", and the jump works its way back out
+|| through every second one: "the effect of executing R[10, Even, Odd],
+|| say, is to jump to the destination "Even", whereas R[9, Even, Odd]
+|| jumps to the destination "Odd"."
 let rec routine R[integer n, label L, M] be
    $( if n > 0 do R[n - 1, M, N]
    N: goto L $)

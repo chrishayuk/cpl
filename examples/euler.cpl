@@ -1,7 +1,12 @@
 || Euler's transformation of a slowly convergent alternating series, from
 || "The Main Features of CPL" (1963), who took it from the ALGOL Report.
-|| Rewritten in the notation of 1966: definitions by let, value of ...
-|| result is, and Newarray for the 1963 function Array.
+|| This is an adaptation, not a transcription. Besides the notation of
+|| 1966 (definitions by let, value of ... result is, Newarray for the 1963
+|| function Array) the names are changed: Fct, Eps, Tim, Mn, Ds and Sum
+|| are f, e, t, u, d and s here, and the paper's counter t is c. The
+|| paper's index n = 0 is an integer here, and the variables are set to
+|| zero in one simultaneous assignment rather than in their declarations.
+|| The recurrence itself is the paper's.
 
 let Euler[function f, real e, integer t] = value of
    $(1 let i, n, c be integer

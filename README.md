@@ -3,10 +3,11 @@
 An implementation of **CPL**, the Combined Programming Language designed at
 Cambridge and London between 1962 and 1966 by Christopher Strachey, David
 Barron, John Buxton, David Hartley, Eric Nixon and others. CPL is the
-ancestor of BCPL, and through BCPL of B and C. The whole language was never
-implemented: the London compiler was for a subset, CPL1, with "no types
-general, complex or double length" and no lists, and the Cambridge one, in
-Martin Richards' words, "did not result in a satisfactory implementation".
+ancestor of BCPL, and through BCPL of B and C. The whole language was not
+implemented in the 1960s: the London compiler was for a subset, CPL1, with
+"no types general, complex or double length" and no lists, and the
+Cambridge one, in Martin Richards' words, "did not result [in] a
+satisfactory implementation" (his text has "result is", plainly a slip).
 
 This one is written from the documents: chiefly the unfinished *Reference
 Manual* in the *CPL Working Papers* of July 1966. It is a compiler to an
@@ -27,7 +28,8 @@ HCF[1071, 462] = 21
 ```
 
 That is the Euclidean algorithm from section 24 of the *Elementary
-Programming Manual*, unchanged except for the character set.
+Programming Manual*, changed only in the character set and in one bracket:
+the manual prints the first recursive call as `HCF m, n]`.
 
 - **New to CPL?** Start with the [tutorial](tutorial/01-introduction.md):
   19 chapters, from hello world to LH functions.
@@ -246,9 +248,12 @@ These are the bits, and where to see each one working.
 | `rec` required for recursion | Every function recursive | `own-variables.cpl` |
 | Juxtaposition for multiplication, one-letter names | Long names | `types.cpl` |
 
-The switch-command, section brackets, `value of` / `result is`, `test`,
-`unless`, `repeat while` and simultaneous assignment all survived into BCPL;
-the switch that still falls through in C is in `switch.cpl`.
+Section brackets, `value of` / `result is`, `test`, `unless`, `repeat
+while`, simultaneous assignment and simultaneous declarations all survived
+into BCPL. The switch went the other way: Richards says `SWITCHON` was
+included in BCPL and "retro-fitted into CPL in 1966", which fits its
+appearing only in the last pages of the 1966 appendix. The switch that
+still falls through in C is in `switch.cpl`.
 
 ## Writing CPL in ASCII
 
@@ -350,7 +355,8 @@ and a `.in` file if it reads input. `cargo test` runs them all. A program
 whose `.out` ends with a line beginning `!` ends, on purpose, with that
 error.
 
-From the documents, transcribed from the printed text:
+From the documents. Each file's header says what was changed from the
+printed text, besides the character set and the notation of 1966:
 
 | Program | |
 | --- | --- |
@@ -361,9 +367,14 @@ From the documents, transcribed from the printed text:
 | `manual-gaussquad.cpl` | Elementary Programming Manual 21 (b): Gaussian 3-point integration of a function parameter |
 | `manual-polynomial.cpl` | Elementary Programming Manual 22: a polynomial as a result expression |
 | `factorial.cpl` | The example functions of "The main features of CPL" (1963), in the notation of 1966 |
-| `euler.cpl` | Euler's transformation of a series, from the 1963 paper |
+| `euler.cpl` | Euler's transformation of a series, from the 1963 paper: an adaptation, with the names changed |
 | `labels.cpl` | Reference Manual 9.3.2: the routine that jumps to `Even` or `Odd` |
-| `product.cpl` | The Cartesian product attributed to Strachey, as usually quoted |
+
+And one that is not from the documents read here:
+
+| Program | |
+| --- | --- |
+| `product.cpl` | The Cartesian product attributed to Strachey, as usually quoted; not checked against a primary source |
 
 One for each part of the language:
 
@@ -471,7 +482,7 @@ answer comes from running the program.
 examples in a menu, a box for the program's input, **Run**, **Stop**, and
 **Code** to see the stack machine a program is compiled to, and **Printed**
 to see the program as the papers would have set it. The system is
-compiled unchanged for WASI (`wasm32-wasip1`, about 700 KB), and
+compiled from the same source for WASI (`wasm32-wasip1`, about 700 KB), and
 `web/wasi.js` is a small host that supplies the arguments, standard input
 and standard output, so no other library is needed. Each run happens in a
 worker, which is how an endless program can be stopped.
@@ -613,10 +624,12 @@ distinguished by their result types.
 
 **Where-clauses.** The manual says a where-clause qualifies "the longest
 command, definition or expression immediately preceding it", and twice notes
-that the rule "will be changed". Strachey's `Product` needs each `where` to
-qualify the definiens just before it, inside the scope of that definition's
-parameters. That is the rule used: after a definiens, `where` belongs to
-that definiens; after a command, to the command.
+that the rule "will be changed", without saying how. The `Product` quoted
+above needs each `where` to qualify the definiens just before it, inside the
+scope of that definition's parameters. That is the rule used: after a
+definiens, `where` belongs to that definiens; after a command, to the
+command. This is a departure from the manual's stated rule, not a reading
+of it, and it is made to run a program whose source has not been checked.
 
 **Implementation-dependent quantities.** index is 32 bits and integer 64;
 real and double are both IEEE double precision, so double gains nothing;
@@ -727,6 +740,34 @@ would give out after about a thousand.
 | `src/analysis.rs` | a program read without being run: tokens, definitions and their scopes, problems; behind `cpl --check` and the language server |
 | `lsp/` | the language server, a crate of its own |
 | `editors/` | the Visual Studio Code extension, and notes for other editors |
+
+## Corrections to the sources
+
+Every place where a program or quotation here differs from its source,
+beyond the character set and the ASCII forms above, is listed here, with
+its kind: a **slip** is wrong under any reading of the source; a
+**conflict** is a place where the sources say two things and the printed
+text follows the other one; an **interpretation** is our reading of what
+was meant; **ours** is a consequence of choices made in this
+reconstruction.
+
+| Source | Printed | Here | Kind |
+| --- | --- | --- | --- |
+| Elementary Programming Manual 24 (`manual-hcf.cpl`) | `HCF m, n]` | `HCF[m, n]` | slip |
+| Elementary Programming Manual 21 (b) (`manual-gaussquad.cpl`) | heading with no `be` | `be` added | slip |
+| Elementary Programming Manual 20.1, 21 (a), 21 (b) | parameters as typed | the `ref` and `val` written in by hand | conflict |
+| Elementary Programming Manual 22 (`manual-polynomial.cpl`) | `for i = Step[10, -1, 0]` | `for i = step 10, -1, 0`, as in the block printed just before | conflict |
+| Elementary Programming Manual 22 | `f[x] = ...` | `let f[x] = ...` | ours |
+| Main Features 29 (`factorial.cpl`) | `function Exp[x]`, `real s, t, r` | `Exp1`, so as not to hide the basic function; no type, so real by default | ours |
+| Main Features 29 (`euler.cpl`) | `Fct`, `Eps`, `Tim`, `Mn`, `Ds`, `Sum`, `index n = 0` | other names, `integer n`, set to zero together | ours |
+| Reference Manual 8.3.5 | `where` qualifies the longest preceding command, definition or expression | after a definiens, that definiens only | ours |
+| Richards, p. 1 | "did not result is a satisfactory implementation" | quoted as "result [in]" | slip |
+| Appendix 1 | eleven corrections | see [`appendix1/README.md`](appendix1/README.md#the-slips): nine slips and two conflicts | slip, conflict |
+| Appendix 1, Part 3 | informal definitions | three readings beyond the text: one interpretation, two ours | interpretation, ours |
+
+Up to version 0.1.1 `factorial.cpl` also replaced the 1963 stopping test
+`t < 1₁₀−8` by `t << 1`, which changed the algorithm; the paper's test is
+now used.
 
 ## Sources
 

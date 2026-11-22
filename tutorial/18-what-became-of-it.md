@@ -8,19 +8,22 @@ complex or double length", no lists, and restrictions on functions.
 Cambridge had another, built in an unusual way: the compiler was written
 in CPL itself and translated by hand into the macros of Strachey's General
 Purpose Macrogenerator. Martin Richards, who worked on it, wrote later
-that it "did not result in a satisfactory implementation". The reference
+that it "did not result [in] a satisfactory implementation". The reference
 manual, edited by Strachey, was circulated as a draft in the *CPL Working
 Papers* of July 1966, with a list of "changes foreseen" at the back. There
 was no later edition.
 
-So the programs in this tutorial have, for the most part, never been run
-before. Nobody had a CPL system that would accept the whole language.
+Nobody then had a CPL system that would accept the whole language, so
+many of the programs in this tutorial could not have been run at the time.
+Some might have been, on a subset; whether any has been run since, on some
+other implementation, has not been looked into.
 
 The same is true of the one large program in the Working Papers, a
 preprocessor of about 190 lines given as "a general example of a CPL
 program". Someone wrote across the top of it, "This draft has not been
-fully checked". It runs now, after eleven corrections:
-[appendix1](../appendix1/README.md) has the story.
+fully checked". It runs now, after eleven corrections and with about
+twenty definitions that the appendix gives only informally or not at all
+written for it: [appendix1](../appendix1/README.md) has the story.
 
 ## BCPL
 
@@ -37,7 +40,7 @@ difficult bits were these.
 | Fixed and free functions with free variables ([10](10-fixed-and-free.md)) | A function may not use the local variables of another at all |
 | Functions as results | Only the address of the code |
 | LH functions ([16](16-lh-functions.md)) | Gone |
-| `where`, `in`, simultaneous definitions ([7](07-blocks-and-scope.md)) | Gone |
+| `where` and `in` ([7](07-blocks-and-scope.md)) | Gone (simultaneous definitions and `and` stayed) |
 | Jumps out of functions through label values ([15](15-labels-and-jumps.md)) | `level` and `longjump` |
 | `rec` needed for recursion | Every function may be recursive |
 | One-letter names and multiplication without a sign | Long names in small letters |
@@ -45,9 +48,11 @@ difficult bits were these.
 
 What stayed is just as striking: section brackets, `let`, `:=`, `valof`
 and `resultis`, `if`, `unless`, `test`, `while`, `until`, `repeat`, `for`,
-`break`, `return`, `switchon` with `case` and `default`, conditional
-expressions, and the L-value and the R-value, which became the address of
-a word and its contents.
+`break`, `return`, simultaneous definitions, conditional expressions, and
+the L-value and the R-value, which became the address of a word and its
+contents. `switchon` with `case` and `default` went the other way: Richards
+says it was put into BCPL for the compiler's own use and "retro-fitted into
+CPL in 1966".
 
 ## The same program, three times
 
@@ -109,8 +114,9 @@ Write[c[], '*n']
 
 This cannot be written in BCPL, in B, or in C. It needs a function to
 carry its free variables with it, which was one of the difficult bits.
-Programmers who were not using LISP waited about thirty years to get it
-back.
+Other languages kept the idea going: PAL, built at MIT in BCPL and taught
+from 1968, and ML, first implemented in 1974, both had functions like
+this. It was the languages descended from BCPL that went without.
 
 ## What C still owes
 
@@ -119,8 +125,8 @@ back.
 | `{` and `}` | the section brackets § and its struck-through twin |
 | `lvalue` and `rvalue`, in every C compiler's error messages | Strachey's L-value and R-value |
 | `a ? b : c` | `a -> b, c` |
-| `switch`, `case`, `default`, and falling through | the switch-command of 1966 |
-| `break`, `return`, `while`, `for`, `if` | the same words in CPL |
+| `switch`, `case`, `default`, and falling through | BCPL's `switchon`, which also became the switch-command of 1966 |
+| `break`, `return`, `while`, `for`, `if` | the same words in CPL, and `if`, `for` and `while` in ALGOL 60 before it |
 | `&x` and `*p` | BCPL's `@` and `!`, which replaced definition by reference |
 | an array name meaning the address of its elements | the CPL array as a pointer ([11](11-arrays.md)) |
 | `x = y = 0`, `+=`, and assignment as an expression | not CPL: there, assignment was strictly a command |

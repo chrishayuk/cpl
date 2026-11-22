@@ -180,11 +180,13 @@ qa("Was CPL ever fully implemented?",
    "general, complex or double length\" and no lists. The Cambridge compiler was "
    "written in CPL itself and translated by hand into the macros of Strachey's "
    "General Purpose Macrogenerator; Martin Richards, who worked on it, wrote later "
-   "that it \"did not result in a satisfactory implementation\". The language was "
+   "that it \"did not result [in] a satisfactory implementation\". The language was "
    "too big for the machines and the compiler writers of its day, and the reference "
    "manual was still a draft when the project ended. The `cpl` system in this "
-   "project is a modern implementation written from that manual, so most CPL "
-   "programs that use the whole language had never been run before it.")
+   "project is a modern implementation written from that manual. Programs that "
+   "use the whole language could not have been run on any system of the time; "
+   "whether any has been run since, on another implementation, has not been "
+   "looked into.")
 
 qa("How is CPL related to BCPL, B and C?",
    "CPL is the ancestor of all three. Martin Richards, who worked on the Cambridge "
@@ -192,10 +194,12 @@ qa("How is CPL related to BCPL, B and C?",
    "compilers in: \"Basic CPL\", or BCPL, which he described as \"CPL with all the "
    "difficult bits removed\". Ken Thompson cut BCPL down to make B, and Dennis "
    "Ritchie built B up again to make C. Much of what a C programmer takes for "
-   "granted was first written down for CPL: `x := x + 1` as a command that updates "
-   "a location, the distinction between the two sides of an assignment, `if`, "
-   "`while`, `for`, `break`, `return`, the block as an expression, `switch` and "
-   "`case`. Even the curly brackets began as CPL's section brackets.")
+   "granted reached C by way of CPL. Some of it CPL had from ALGOL 60: assignment "
+   "with `:=`, `if`, `for` and `while`. Some of it is not in ALGOL 60 and came to "
+   "C from CPL: Strachey's L-value and R-value, `break`, `return` and the block as "
+   "an expression. `switch` and `case` came by way of BCPL: Richards says "
+   "`SWITCHON` was put into BCPL and retro-fitted into CPL in 1966. The curly "
+   "brackets descend from CPL's section brackets.")
 
 qa("What documents is this CPL implementation based on?",
    "Chiefly the unfinished Reference Manual in the CPL Working Papers (University "
@@ -363,7 +367,7 @@ qa("Can I run CPL in a web browser?",
    "is in the `web/` directory. It has an editor, the examples in a menu, a box for "
    "the program's input, **Run**, **Stop**, **Code** to see the stack machine a "
    "program is compiled to, and **Printed** to see the program as the papers would "
-   "have set it. The system is compiled unchanged for WASI (`wasm32-wasip1`), and "
+   "have set it. The system is compiled from the same source for WASI (`wasm32-wasip1`), and "
    "each run happens in a worker, which is how an endless program can be stopped. "
    "The editor part loads CodeMirror from a CDN and gives colours, problems as you "
    "type, hover help and completion; without a network connection the plain box "
@@ -1311,7 +1315,10 @@ qa("What is Strachey's Cartesian product program in CPL?",
           "Write[Length[Product[List[List[1, 2, 3], List[4, 5], List[6, 7, 8, 9]]]], '*n']") +
    "\n\nThe project's README notes that the program is attributed to Strachey in "
    "the form in which it is usually quoted, and that the text has not been checked "
-   "against a primary source.")
+   "against a primary source. To run it, this implementation lets a where-clause "
+   "after a definiens qualify that definiens alone, which departs from the 1966 "
+   "manual's rule that a where-clause qualifies the longest command, definition or "
+   "expression before it.")
 
 qa("How do I spread a list into separate variables in CPL?",
    "In a definition or an assignment with several names on the left and one list "
@@ -1673,12 +1680,14 @@ qa("What did BCPL take out of CPL?",
    "one-letter names gave way to long names.")
 
 qa("What survived from CPL into BCPL?",
-   "The switch-command, section brackets, `value of` and `result is` (as `valof` "
-   "and `resultis`), `test`, `unless`, `repeat while` and simultaneous assignment "
-   "all survived into BCPL, along with `let`, `:=`, `if`, `while`, `until`, "
-   "`repeat`, `for`, `break`, `return`, conditional expressions, and the L-value "
-   "and the R-value, which became the address of a word and its contents. The "
-   "switch that still falls through in C is the switch-command of 1966.")
+   "Section brackets, `value of` and `result is` (as `valof` and `resultis`), "
+   "`test`, `unless`, `repeat while`, simultaneous assignment and simultaneous "
+   "declarations all survived into BCPL, along with `let`, `:=`, `if`, `while`, "
+   "`until`, `repeat`, `for`, `break`, `return`, conditional expressions, and the "
+   "L-value and the R-value, which became the address of a word and its contents. "
+   "The switch went the other way: Richards says `SWITCHON` was included in BCPL "
+   "and retro-fitted into CPL in 1966, where it is the switch-command of the "
+   "1966 appendix. It still falls through in C.")
 
 qa("What is the difference between CPL and BCPL?",
    "BCPL, \"Basic CPL\", is the small language Martin Richards designed for "
@@ -1690,8 +1699,8 @@ qa("What is the difference between CPL and BCPL?",
    "address of a variable can be taken with `@` and followed with `!`. CPL "
    "functions carry free variables, fixed or free, and can be returned as "
    "results; a BCPL function may not use the local variables of another at all. "
-   "CPL has LH functions, `where`, `in` and simultaneous definitions; BCPL does "
-   "not. CPL jumps out of functions through label values; BCPL has `level` and "
+   "CPL has LH functions, `where` and `in`; BCPL does not, though it kept "
+   "simultaneous declarations and `and`. CPL jumps out of functions through label values; BCPL has `level` and "
    "`longjump`. CPL needs `rec` for recursion; in BCPL every function may be "
    "recursive. CPL has one-letter names and multiplication without a sign; BCPL "
    "has long names in small letters. Richards had found that most of the "

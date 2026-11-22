@@ -1,6 +1,9 @@
-|| Section 21 (b) of the Elementary Programming Manual, as printed: "This
-|| routine sets I to the integral of f(x) dx from a to b, using a Gaussian
-|| 3-point formula." The function to be integrated is a parameter.
+|| Section 21 (b) of the Elementary Programming Manual. "This routine sets
+|| I =" the integral of f(x) dx from a to b (printed as a formula) "using a
+|| Gaussian 3-point formula." The function to be integrated is a parameter.
+|| The routine is as printed, with the corrections made by hand on the copy
+|| (ref I, val function f), except that the heading is printed without the
+|| final be, which is put in here.
 
 routine Gaussquad[real a, b, ref I, val function f] be
 $( let s = (b - a)

@@ -1,9 +1,14 @@
 || Section 22 of the Elementary Programming Manual: a result expression.
-|| "Suppose we wish to define the function f(x) = the sum of a[n] x**n for
-|| n from 0 to 10. Let us suppose that the coefficients are available as
-|| an array A with subscripts running from 0 to 10."
+|| "Suppose we wish to define the function:" f(x), the sum of c[n] x to
+|| the n for n from 0 to 10 (printed as a formula). "Let us suppose that
+|| the coefficients are available as an array A with subscripts running
+|| from 0 to 10."
 ||
 || "value of" turns the block into an expression; "result is" ends it.
+|| Two changes from the printed definition: it begins with let, as a 1966
+|| definition must, and its for-list is written step 10, -1, 0 as in the
+|| block printed just before it, where the definition itself has
+|| Step[10, -1, 0].
 
 let A = Formarray[real, (0, 10)][1, 1, 1/2, 1/6, 1/24, 1/120, 1/720, 1/5040, 1/40320, 1/362880, 1/3628800]
 

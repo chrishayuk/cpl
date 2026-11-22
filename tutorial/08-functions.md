@@ -132,7 +132,8 @@ Write[Fact[5], ' ', Fact[20], '*n']
 120 2432902008176640000
 ```
 
-This is the Euclidean algorithm exactly as the manual gives it:
+This is the Euclidean algorithm as the manual gives it, but for one
+bracket: the manual prints the first recursive call as `HCF m, n]`.
 
 ```cpl
 let rec HCF[integer n, m] =

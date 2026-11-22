@@ -16,14 +16,17 @@ people who worked on the Cambridge compiler, Martin Richards, took what he
 had learnt and designed a small language for writing compilers in: "Basic
 CPL", or BCPL. Ken Thompson cut BCPL down to make B, and Dennis Ritchie
 built B up again to make C. Much of what a C programmer takes for granted
-was first written down for CPL: `x := x + 1` as a command that updates a
-location, the distinction between the two sides of an assignment, `if`,
-`while`, `for`, `break`, `return`, the block as an expression, `switch` and
-`case`. Even the curly brackets began as CPL's section brackets.
+reached C by way of CPL. Some of it CPL had from ALGOL 60: assignment with
+`:=`, `if`, `for` and `while`. Some of it is not in ALGOL 60 and came to C
+from CPL: Strachey's L-value and R-value, the distinction between the two
+sides of an assignment; `break`, `return` and the block as an expression.
+`switch` and `case` came by way of BCPL. The curly brackets descend from CPL's section
+brackets.
 
-This tutorial teaches the full language as the 1966 manual describes it,
-using an implementation that was written from that manual sixty years
-later. Every program in it is run by the test suite, and the output shown
+This tutorial teaches the language as the 1966 manual describes it, as far
+as an implementation written from that manual sixty years later goes. The
+[README](../README.md#choices-deviations-and-omissions) lists what it
+leaves out and where it departs from the manual. Every program in it is run by the test suite, and the output shown
 is what the program really printed.
 
 ## Running a program
