@@ -1,6 +1,4 @@
 || Elementary Programming Manual, section 24: the Euclidean algorithm.
-|| As printed except for the character set and one bracket: the first
-|| recursive call is printed HCF m, n], with no opening [.
 
 let rec HCF[integer n, m] =
         (m > n -> HCF[m, n],
@@ -9,3 +7,6 @@ let rec HCF[integer n, m] =
 
 Write['HCF[1071, 462] = ', HCF[1071, 462], '*n']
 Write['HCF[17, 5]     = ', HCF[17, 5], '*n']
+
+|| As printed except for the character set and one bracket: the first
+|| recursive call is printed HCF m, n], with no opening [.
