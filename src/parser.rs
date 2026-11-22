@@ -991,12 +991,10 @@ impl Parser {
     fn product(&mut self) -> PR<Expr> {
         let mut e = self.signed()?;
         loop {
-            if self.eat_sym("*") {
-            } else if !self.peek().nl
+            let juxtaposed = !self.peek().nl
                 && (matches!(self.peek().tok, Tok::Name(_) | Tok::Num(_)) || self.is_sym("("))
-                && !matches!(self.peek_at(1), Tok::Sym(":"))
-            {
-            } else {
+                && !matches!(self.peek_at(1), Tok::Sym(":"));
+            if !self.eat_sym("*") && !juxtaposed {
                 return Ok(e);
             }
             e = Expr::Bin(BinOp::Mul, Box::new(e), Box::new(self.signed()?));
