@@ -2,6 +2,7 @@
 //! implemented from the Reference Manual draft in the CPL Working Papers of
 //! July 1966. See the README for what is and is not covered.
 
+pub mod analysis;
 pub mod ast;
 pub mod builtins;
 pub mod code;

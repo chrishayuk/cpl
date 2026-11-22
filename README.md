@@ -37,8 +37,49 @@ Programming Manual*, unchanged except for the character set.
   large CPL program in the documents, run here, slips and all.
 - **No terminal handy?** The [browser playground](#in-the-browser) runs the
   same system in a web page.
+- **Writing some?** There is a [language server and a Visual Studio Code
+  extension](#in-your-editor).
+
+## Install
+
+You need [Rust](https://rustup.rs). To install the system and the language
+server from this repository:
+
+```bash
+cargo install --git https://github.com/chrishayuk/cpl cpl cpl-lsp
+```
+
+That puts `cpl` and `cpl-lsp` in `~/.cargo/bin`. Then:
+
+```bash
+cpl -e "Write['Hello, world!*n']"
+```
+
+For Visual Studio Code, download `cpl-language-0.1.0.vsix` from the
+[v0.1.0 release](https://github.com/chrishayuk/cpl/releases/tag/v0.1.0)
+and install it:
+
+```bash
+code --install-extension cpl-language-0.1.0.vsix
+```
+
+To build the extension yourself instead, see
+[`editors/vscode`](editors/vscode/README.md).
+
+Open any `.cpl` file and you get highlighting, hover help, problems as
+you type, and a run button. The extension carries its own copy of the
+system and the language server, so it works without the `cargo install`
+above. For Neovim, Helix and other editors see
+[`editors/README.md`](editors/README.md).
+
+To install nothing at all, there is a playground that runs CPL in your
+browser at <https://chrishayuk.com/demos/cpl>, and a note about the 1966
+preprocessor at
+<https://chrishayuk.com/notebook/a-1966-program-said-it-had-not-been-checked>.
 
 ## Quick start
+
+To work on the system itself, clone the repository and:
 
 ```bash
 cargo build --release
@@ -55,6 +96,7 @@ Or install it as `cpl` with `cargo install --path .`.
 Usage: cpl [OPTIONS] <FILE.cpl>
        cpl [OPTIONS] -e <PROGRAM>
        cpl [OPTIONS] -            (the program is read from standard input)
+       cpl --check <FILE.cpl>...  (- for standard input)
 
 Options:
   -e, --eval <PROGRAM> Run the program text given on the command line
@@ -64,6 +106,8 @@ Options:
       --publication    Print the program as it would be printed: underlined
                        basic symbols, section signs, mathematical signs
       --max-steps <N>  Stop with an error after N machine steps
+      --check          Report what is wrong with each program, with line and
+                       column, without running it
   -h, --help           Show this help
   -V, --version        Show the version
 ```
@@ -419,19 +463,70 @@ rewrites the outputs after a deliberate change.
 examples in a menu, a box for the program's input, **Run**, **Stop**, and
 **Code** to see the stack machine a program is compiled to, and **Printed**
 to see the program as the papers would have set it. The system is
-compiled unchanged for WASI (`wasm32-wasip1`, about 600 KB), and
+compiled unchanged for WASI (`wasm32-wasip1`, about 700 KB), and
 `web/wasi.js` is a small host that supplies the arguments, standard input
 and standard output, so no other library is needed. Each run happens in a
 worker, which is how an endless program can be stopped.
 
+`web/editor.js` turns the program box into an editor with colours, problems
+as you type, hover help and completion. It loads CodeMirror from a CDN, so
+that part needs a network connection; without one the plain box still works.
+`web/lsp-worker.js` runs the language server in a page the same way as the
+system: it is the WASI build of `cpl-lsp`, given one program and a list of
+questions per run.
+
 ```bash
-node web/build.mjs                  # builds web/cpl.wasm and web/examples.json
-node web/test.mjs                   # runs every example through the wasm build
+node web/build.mjs                  # builds web/cpl.wasm, web/cpl-lsp.wasm and web/examples.json
+node web/test.mjs                   # runs every example through the wasm build, and questions the server
 python3 -m http.server -d web 8000  # then open http://localhost:8000
 ```
 
 Add `?example=mandelbrot` to the address to open a particular example, and
 `&run` to run it straight away.
+
+## In your editor
+
+`cpl --check program.cpl` reads a program without running it and reports
+what is wrong, with the line and the column: a string or a section bracket
+that is never closed, a tag that matches nothing, a mistake of syntax, a
+name that is not defined. The messages are the system's own. Given
+
+```
+let Total, n = 0, 3
+for i = 1 to n do
+   $( Total := Total + i
+Write['Total is ', total, '*n]
+```
+
+```bash
+cpl --check sum.cpl
+```
+
+```text
+sum.cpl:3:4: error: this section bracket is never closed
+sum.cpl:4:27: error: string constant has no closing quote
+```
+
+The exit status is 1 if any program has an error. Every example passes
+but the one that is there to show a mistake the compiler finds:
+
+```bash
+target/release/cpl --check examples/*.cpl
+```
+
+```text
+examples/fixed-and-free.cpl:23:25: error: Count is a free variable of the fixed function Bad, which may not assign to it (a function defined with == is free and may)
+```
+
+The same analysis drives a language server, `cpl-lsp` in `lsp/`, with
+hover help for every basic symbol and basic function, go to definition,
+references, rename, completion and more. `editors/vscode` is a Visual
+Studio Code extension that bundles the server and the system as
+WebAssembly and adds syntax highlighting, for publication CPL in `.pub`
+files too, and a run button. See [`editors/README.md`](editors/README.md).
+
+The system itself still has no dependencies. The language server is a
+separate crate in the same workspace and uses `serde_json`.
 
 ## WebAssembly + WASI
 
@@ -464,13 +559,20 @@ cargo test
 | `tests/programs.rs` | runs all 73 examples against their `.out` files (`CPL_BLESS=1` rewrites them), and 32 tests of single features: juxtaposition, the two kinds of function, type deduction, labels, recursion 50,000 deep, the bit functions, the output routines |
 | `tests/tutorial.rs` | runs the 205 programs of the tutorial |
 | `tests/appendix1.rs` | runs the 1966 preprocessor on a sample and on itself, and checks each of its eleven slips |
+| `tests/check.rs` | `cpl --check` and the analysis behind it: every example passes, and on the examples, the tutorial's programs and a set of broken ones the check finds an error exactly when the system does, with the same message |
 | `cargo test --target wasm32-wasip1` | the same, inside wasmtime |
 | `scripts/wasi-check.sh` | native and WASI builds agree on every example, byte for byte |
-| `node web/test.mjs` | the browser's WASI host runs every example, reports errors, survives deep recursion |
+| `node web/test.mjs` | the browser's WASI host runs every example, reports errors, survives deep recursion; the language server answers through the code the page's editor uses |
+
+```bash
+cargo test -p cpl-lsp                    # the language server
+cd editors/vscode && npm install && npm run build && npm test
+```
 
 `.github/workflows/ci.yml` runs all of these, with `cargo fmt --check` and
-`cargo clippy -- -D warnings`. The page itself (`index.html`, `worker.js`)
-has no automated test.
+`cargo clippy -- -D warnings`. `npm run test:vscode`, which drives the
+extension inside a real Visual Studio Code, is run by hand. The page itself
+(`index.html`, `worker.js`, `editor.js`) has no automated test.
 
 ## Choices, deviations and omissions
 
@@ -602,6 +704,9 @@ would give out after about a thousand.
 | `src/vm.rs` | activations, L-values, jumps |
 | `src/value.rs` | data items, transfer functions, polymorphic operators |
 | `src/builtins.rs` | basic functions and routines |
+| `src/analysis.rs` | a program read without being run: tokens, definitions and their scopes, problems; behind `cpl --check` and the language server |
+| `lsp/` | the language server, a crate of its own |
+| `editors/` | the Visual Studio Code extension, and notes for other editors |
 
 ## Sources
 
@@ -624,3 +729,10 @@ has the few details of pages that the list of slips refers to.
   used for the language definition, but it confirms two readings made here:
   that the list processing of 1963 is "not part of CPL as defined by the
   reference manual", and that `b -> 1, 3.24` is real.
+
+## Licence
+
+Apache License 2.0 - see [LICENSE](LICENSE). That covers the code, the
+examples and the tutorial. The details of pages in `appendix1/scans` are
+reproduced for reference and remain the copyright of their authors and
+publishers.

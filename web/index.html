@@ -28,6 +28,31 @@
   button:disabled { opacity: .35; cursor: default; }
   .err { color: var(--err); }
   #status { font: 12px ui-monospace, monospace; opacity: .6; }
+  /* The editor that replaces the program box when it can be loaded (editor.js). */
+  .cpl-editor { height: 340px; border: 1px solid var(--rule); resize: vertical; overflow: hidden; }
+  .cpl-editor .cm-editor { height: 100%; }
+  .cpl-editor .cm-editor.cm-focused { outline: 1px solid var(--accent); }
+  .cpl-editor .cm-scroller { font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .cpl-editor .cm-content { padding: 12px; caret-color: currentColor; }
+  .cpl-editor .cm-line { padding: 0; }
+  .cpl-editor .cm-cursor { border-left-color: currentColor; }
+  .cpl-token-comment { color: color-mix(in srgb, currentColor 55%, transparent); font-style: italic; }
+  .cpl-token-string { color: color-mix(in srgb, #3f8f4f 70%, currentColor); }
+  .cpl-token-number { color: color-mix(in srgb, #2f7fb8 70%, currentColor); }
+  .cpl-token-function { color: color-mix(in srgb, #c96a14 80%, currentColor); font-weight: 600; }
+  .cpl-token-function.cpl-token-basic { font-weight: 400; }
+  .cpl-token-parameter { color: color-mix(in srgb, #a0489a 75%, currentColor); }
+  .cpl-token-keyword { color: color-mix(in srgb, #b8323a 70%, currentColor); }
+  .cpl-token-type { color: color-mix(in srgb, #1f8a8a 75%, currentColor); }
+  .cpl-token-label { color: color-mix(in srgb, #8a6d1f 80%, currentColor); text-decoration: underline; }
+  .cpl-token-operator { color: color-mix(in srgb, currentColor 75%, transparent); }
+  .cm-tooltip.cm-tooltip-hover, .cm-tooltip.cm-tooltip-autocomplete, .cm-tooltip.cm-tooltip-lint { border: 1px solid #22251f55; background: #fbf9f3; color: #22251f; box-shadow: 0 6px 24px #0003; max-width: min(460px, 86vw); }
+  .cpl-hover { padding: 10px 14px; font: 13px/1.55 system-ui, sans-serif; }
+  .cpl-hover p { max-width: none; opacity: 1; margin: 0 0 6px; white-space: pre-line; }
+  .cpl-hover p:last-child { margin-bottom: 0; }
+  .cpl-hover code, .cpl-hover pre { font: 12px/1.5 ui-monospace, monospace; background: #22251f14; padding: 1px 4px; }
+  .cpl-hover pre { width: auto; height: auto; border: 0; margin: 0 0 6px; padding: 6px 8px; }
+  .cm-tooltip-autocomplete ul li[aria-selected] { background: #22251f !important; color: #fbf9f3 !important; }
 </style>
 </head>
 <body>
@@ -35,7 +60,7 @@
   <h1>CPL</h1>
   <p>The Combined Programming Language of Cambridge and London, 1962 to 1966: the ancestor of BCPL, B and C,
      and never fully implemented in its day. This is the same Rust program as the command line, compiled to
-     WebAssembly and running in your browser. <b>Code</b> shows the stack machine a program is compiled to, and <b>Printed</b> shows it as it would
+     WebAssembly and running in your browser. Hover over a word or a name to see what it is. <b>Code</b> shows the stack machine a program is compiled to, and <b>Printed</b> shows it as it would
      have looked on paper in 1966.
      <a href="https://github.com/chrishayuk/cpl">Source, tutorial and the 1966 preprocessor</a>.</p>
   <div class="bar">
@@ -61,14 +86,17 @@
 </main>
 <script type="module">
 const $ = (id) => document.getElementById(id);
+import { upgrade } from "./editor.js";
 const examples = await (await fetch("examples.json")).json();
 let worker = null;
+let editor = null; // the language-aware editor, once it has loaded
 
 for (const example of examples) $("examples").add(new Option(example.name, example.name));
 function load(name) {
   const example = examples.find((e) => e.name === name) ?? examples[0];
   $("examples").value = example.name;
   $("program").value = example.program;
+  editor?.set(example.program);
   $("input").value = example.input;
   $("output").textContent = "";
   $("status").textContent = "";
@@ -110,6 +138,9 @@ $("code").onclick = () => start("code");
 $("printed").onclick = () => start("printed");
 $("stop").onclick = () => finish("stopped");
 if (new URLSearchParams(location.search).has("run")) $("run").click();
+// Colours, problems and hover help, if the editor can be fetched; otherwise
+// the plain box above keeps working.
+upgrade($("program"), { onRun: () => $("run").click() }).then((made) => { editor = made; });
 $("program").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) $("run").click();
 });

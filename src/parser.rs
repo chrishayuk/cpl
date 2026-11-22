@@ -17,15 +17,88 @@ pub type PR<T> = Result<T, String>;
 pub struct Parser {
     toks: Vec<Token>,
     pos: usize,
+    /// The definitions met so far.
+    notes: Vec<Note>,
+    /// True within a definition marked `rec`, whose functions know themselves.
+    rec: bool,
+    /// The bodies that labels belong to, innermost last: where each starts
+    /// and the labels set in it so far.
+    frames: Vec<(usize, Vec<usize>)>,
+}
+
+/// What kind of thing a name is defined to be.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NoteKind {
+    Variable,
+    Constant,
+    Function,
+    Routine,
+    Parameter,
+    Label,
+    /// The controlled variable of a for-command.
+    Loop,
+}
+
+/// A definition the parser met, kept for `analysis.rs`, which tells an
+/// editor where each name is defined. Places are indexes into the tokens.
+#[derive(Clone, Debug)]
+pub struct Note {
+    pub kind: NoteKind,
+    /// The token that is the name.
+    pub token: usize,
+    /// The tokens in which the name has this meaning: from, and up to.
+    pub scope: (usize, usize),
+    /// The tokens of the whole definition.
+    pub extent: (usize, usize),
+    /// For a parameter, the note of its function or routine.
+    pub owner: Option<usize>,
+    /// Defined by a where-clause.
+    pub by_where: bool,
+    /// A function in a recursive definition: its scope includes itself.
+    rec: bool,
+    /// The scope is not yet known: the construct the definition is part of
+    /// (a block, `in`, `where`) will say.
+    waiting: bool,
+}
+
+/// What `parse_noting` gives back.
+pub struct Parsed {
+    pub items: PR<Vec<Item>>,
+    pub notes: Vec<Note>,
+    /// The token the parser had reached: if it failed, the one it could not take.
+    pub at: usize,
 }
 
 pub fn parse(toks: Vec<Token>) -> PR<Vec<Item>> {
-    let mut p = Parser { toks, pos: 0 };
-    let items = p.items(false)?;
-    if p.peek().tok != Tok::Eof {
-        return p.err("a closing section bracket with no matching opening bracket");
+    parse_noting(toks).items
+}
+
+/// Parses, and also reports every definition met on the way, even when the
+/// program turns out to be wrong further on.
+pub fn parse_noting(toks: Vec<Token>) -> Parsed {
+    let end = toks.len();
+    let mut p = Parser {
+        toks,
+        pos: 0,
+        notes: Vec::new(),
+        rec: false,
+        frames: vec![(0, Vec::new())],
+    };
+    let mut items = p.items(false);
+    if items.is_ok() && p.peek().tok != Tok::Eof {
+        items = p.err("a closing section bracket with no matching opening bracket");
     }
-    Ok(items)
+    // A label is known throughout the body it is in.
+    for (from, labels) in std::mem::take(&mut p.frames) {
+        for k in labels {
+            p.notes[k].scope = (from, end);
+        }
+    }
+    Parsed {
+        items,
+        at: p.pos.min(end - 1),
+        notes: p.notes,
+    }
 }
 
 fn describe(t: &Tok) -> String {
@@ -112,6 +185,70 @@ impl Parser {
         }
     }
 
+    // ------------------------------------------------- notes for an editor
+
+    fn note(&mut self, kind: NoteKind, token: usize) -> usize {
+        self.notes.push(Note {
+            kind,
+            token,
+            scope: (token, usize::MAX),
+            extent: (token, token + 1),
+            owner: None,
+            by_where: false,
+            rec: self.rec && matches!(kind, NoteKind::Function | NoteKind::Routine),
+            waiting: false,
+        });
+        self.notes.len() - 1
+    }
+
+    /// Gives a scope to the names defined since note `first` that are still
+    /// waiting for one.
+    fn settle(&mut self, first: usize, scope: (usize, usize), by_where: bool) -> Vec<usize> {
+        let mut settled = Vec::new();
+        for (k, n) in self.notes.iter_mut().enumerate().skip(first) {
+            if n.waiting {
+                n.waiting = false;
+                n.scope = scope;
+                n.by_where = by_where;
+                settled.push(k);
+            }
+        }
+        settled
+    }
+
+    /// The names of a simple definition, once the whole of it has been read.
+    fn note_names(&mut self, kind: NoteKind, at: &[usize], from: usize) {
+        for &token in at {
+            let k = self.note(kind, token);
+            self.notes[k].extent = (from, self.pos);
+            self.notes[k].waiting = true;
+        }
+    }
+
+    /// A function or routine whose body has just been read: its parameters
+    /// are known up to here.
+    fn note_function(&mut self, f: usize, params: (usize, usize), from: usize) {
+        let to = self.pos;
+        self.notes[f].extent = (from, to);
+        self.notes[f].waiting = true;
+        for n in &mut self.notes[params.0..params.1] {
+            n.owner = Some(f);
+            n.scope = (n.token, to);
+        }
+    }
+
+    fn open_frame(&mut self) {
+        self.frames.push((self.pos, Vec::new()));
+    }
+
+    fn close_frame(&mut self) {
+        if let Some((from, labels)) = self.frames.pop() {
+            for k in labels {
+                self.notes[k].scope = (from, self.pos);
+            }
+        }
+    }
+
     fn name(&mut self) -> PR<String> {
         match self.peek().tok.clone() {
             Tok::Name(n) => {
@@ -127,16 +264,21 @@ impl Parser {
     /// The declarations and commands of a block, up to its closing bracket.
     fn items(&mut self, in_block: bool) -> PR<Vec<Item>> {
         let mut out = Vec::new();
+        // The names defined in this block, which are known up to its end.
+        let mut mine: Vec<usize> = Vec::new();
+        let rec = std::mem::take(&mut self.rec);
         loop {
             while self.eat_sym(";") {}
             match &self.peek().tok {
-                Tok::Eof => {
-                    if in_block {
+                Tok::Eof | Tok::Close => {
+                    let at_end = self.peek().tok == Tok::Eof;
+                    if in_block && at_end {
                         return self.err("closing section bracket expected");
                     }
-                    return Ok(out);
-                }
-                Tok::Close => {
+                    for k in mine {
+                        self.notes[k].scope.1 = self.pos;
+                    }
+                    self.rec = rec;
                     if in_block {
                         self.next();
                     }
@@ -148,7 +290,18 @@ impl Parser {
             // without let: "routine LINEQ [...] be".
             let heading = (self.is_kw("routine") || self.is_kw("function")) && matches!(self.peek_at(1), Tok::Name(_));
             if self.eat_kw("let") || heading {
+                let (from, first) = (self.pos, self.notes.len());
                 out.push(Item::Let(self.def()?));
+                // A definition is known from its end, or from its start if
+                // it is recursive (8.3).
+                let to = self.pos;
+                for (k, n) in self.notes.iter_mut().enumerate().skip(first) {
+                    if n.waiting {
+                        n.waiting = false;
+                        n.scope.0 = if n.rec { from } else { to };
+                        mine.push(k);
+                    }
+                }
             } else if self.eat_kw("prefer") {
                 out.push(Item::Prefer(self.ty()?));
             } else if self.eat_kw("sic") {
@@ -252,9 +405,19 @@ impl Parser {
 
     /// <definition> ::= <and definition> | <and definition> in <definition>
     fn def(&mut self) -> PR<Def> {
+        let first = self.notes.len();
         let d = self.and_def()?;
         if self.eat_kw("in") {
+            let (last, from) = (self.notes.len(), self.pos);
             let rest = self.def()?;
+            // D1 in D2: the scope of D1 is D2 alone (8.3.4).
+            let to = self.pos;
+            for n in &mut self.notes[first..last] {
+                if n.waiting {
+                    n.waiting = false;
+                    n.scope = (from, to);
+                }
+            }
             return Ok(Def::In(Box::new(d), Box::new(rest)));
         }
         Ok(d)
@@ -264,11 +427,14 @@ impl Parser {
         // `rec` before a group joined by `and` makes the whole group
         // mutually recursive, as `rec $( ... and ... $)` does in 8.3.2.
         let rec = self.eat_kw("recursive");
+        let outer = self.rec;
+        self.rec |= rec;
         let mut v = vec![self.basic_def()?];
         while self.eat_kw("and") {
             self.eat_kw("recursive");
             v.push(self.basic_def()?);
         }
+        self.rec = outer;
         let d = if v.len() == 1 { v.pop().unwrap() } else { Def::And(v) };
         Ok(if rec { Def::Rec(Box::new(d)) } else { d })
     }
@@ -296,11 +462,13 @@ impl Parser {
                     break;
                 }
             }
+            let at = self.pos;
             out.push(Param {
                 name: self.name()?,
                 ty: ty.clone(),
                 mode,
             });
+            self.note(NoteKind::Parameter, at);
             if !self.eat_sym(",") {
                 break;
             }
@@ -313,17 +481,22 @@ impl Parser {
     /// whose scope is this definiens (and so lies inside the scope of the
     /// formal parameters of the definition).
     fn definiens(&mut self) -> PR<Expr> {
+        let (from, rec) = (self.pos, std::mem::take(&mut self.rec));
         let mut v = self.expr_list()?;
         let mut e = if v.len() == 1 { v.pop().unwrap() } else { Expr::List(v) };
         while self.eat_kw("where") {
+            let first = self.notes.len();
             let d = self.def()?;
+            self.settle(first, (from, self.pos), true);
             e = Expr::Where(Box::new(e), Box::new(d));
         }
+        self.rec = rec;
         Ok(e)
     }
 
     fn basic_def(&mut self) -> PR<Def> {
         let line = self.line();
+        let from = self.pos;
         if self.peek().tok == Tok::Open {
             self.next();
             let d = self.def()?;
@@ -334,7 +507,10 @@ impl Parser {
             return Ok(d);
         }
         if self.eat_kw("recursive") {
-            return Ok(Def::Rec(Box::new(self.basic_def()?)));
+            let outer = std::mem::replace(&mut self.rec, true);
+            let d = self.basic_def()?;
+            self.rec = outer;
+            return Ok(Def::Rec(Box::new(d)));
         }
         let mut constant = None;
         let mut fixed = None;
@@ -354,31 +530,52 @@ impl Parser {
         if self.is_kw("function") || self.is_kw("routine") {
             let is_fn = self.is_kw("function");
             self.next();
+            let at = self.pos;
             let name = self.name()?;
+            let f = self.note(if is_fn { NoteKind::Function } else { NoteKind::Routine }, at);
+            let p0 = self.notes.len();
             let params = if self.is_sym("[") { self.params()? } else { Vec::new() };
+            let p1 = self.notes.len();
             self.expect_kw("be")?;
+            let rec = std::mem::take(&mut self.rec);
             let body = if is_fn {
                 let bracketed = self.peek().tok == Tok::Open;
                 if bracketed {
                     self.next();
                 }
+                let mut fixed_names = Vec::new();
                 let fix = if self.eat_kw("fix") {
-                    Some(Box::new(self.def()?))
+                    let first = self.notes.len();
+                    let d = self.def()?;
+                    fixed_names = self.settle(first, (self.pos, usize::MAX), false);
+                    Some(Box::new(d))
                 } else {
                     None
                 };
                 while self.eat_sym(";") {}
                 self.expect_kw("load")?;
+                self.open_frame();
                 let load = self.block()?;
+                self.close_frame();
                 self.expect_kw("update")?;
+                self.open_frame();
                 let update = self.block()?;
+                self.close_frame();
+                for k in fixed_names {
+                    self.notes[k].scope.1 = self.pos;
+                }
                 if bracketed && self.next() != Tok::Close {
                     return self.err("closing section bracket expected after the body of an LH function");
                 }
                 FuncBody::LH { fix, load, update }
             } else {
-                FuncBody::Routine(Box::new(self.basic()?))
+                self.open_frame();
+                let c = self.basic()?;
+                self.close_frame();
+                FuncBody::Routine(Box::new(c))
             };
+            self.rec = rec;
+            self.note_function(f, (p0, p1), from);
             return Ok(Def::Func {
                 name,
                 params,
@@ -388,9 +585,13 @@ impl Parser {
                 line,
             });
         }
+        let mut name_at = vec![self.pos];
         let mut names = vec![self.name()?];
         if self.is_sym("[") {
+            let f = self.note(NoteKind::Function, name_at[0]);
+            let p0 = self.notes.len();
             let params = self.params()?;
+            let p1 = self.notes.len();
             let free = if self.eat_sym("=") {
                 false
             } else if self.eat_sym("==") {
@@ -399,6 +600,7 @@ impl Parser {
                 return self.err("'=' or '==' expected in a function definition");
             };
             let body = FuncBody::Expr(Box::new(self.definiens()?), free);
+            self.note_function(f, (p0, p1), from);
             let name = names.pop().unwrap();
             return Ok(Def::Func {
                 name,
@@ -410,8 +612,14 @@ impl Parser {
             });
         }
         while self.eat_sym(",") {
+            name_at.push(self.pos);
             names.push(self.name()?);
         }
+        let kind = if constant == Some(true) {
+            NoteKind::Constant
+        } else {
+            NoteKind::Variable
+        };
         if self.eat_kw("be") || self.is_kw("allbe") {
             let all = self.eat_kw("allbe");
             let mut types = vec![self.ty()?];
@@ -429,6 +637,7 @@ impl Parser {
                     types.len()
                 ));
             }
+            self.note_names(kind, &name_at, from);
             return Ok(Def::Type { names, types, line });
         }
         let all = self.eat_kw("all");
@@ -446,6 +655,7 @@ impl Parser {
             Expr::List(v) => v,
             e => vec![e],
         };
+        self.note_names(kind, &name_at, from);
         Ok(Def::Simple {
             names,
             op,
@@ -460,11 +670,15 @@ impl Parser {
 
     /// <command> ::= <basic command> | <command> where <in definition>
     fn command(&mut self) -> PR<Cmd> {
+        let from = self.pos;
         let mut c = self.basic()?;
         while self.is_kw("where") {
             let line = self.line();
             self.next();
+            let (first, rec) = (self.notes.len(), std::mem::take(&mut self.rec));
             let d = self.def()?;
+            self.rec = rec;
+            self.settle(first, (from, self.pos), true);
             c = Cmd {
                 kind: CmdKind::Where(Box::new(c), d),
                 line,
@@ -491,8 +705,13 @@ impl Parser {
         let line = self.line();
         let mk = |kind| Cmd { kind, line };
         if matches!(self.peek().tok, Tok::Name(_)) && matches!(self.peek_at(1), Tok::Sym(":")) {
+            let at = self.pos;
             let n = self.name()?;
             self.next();
+            let k = self.note(NoteKind::Label, at);
+            if let Some(frame) = self.frames.last_mut() {
+                frame.1.push(k);
+            }
             return Ok(mk(CmdKind::Labelled(n, self.labelled_body()?)));
         }
         if self.eat_kw("case") {
@@ -530,11 +749,18 @@ impl Parser {
             // the for symbol is followed by ext" (Elementary Manual, 13.2).
             // The variable is then assigned to at the start of each cycle.
             let ext = self.eat_kw("ext");
+            let at = self.pos;
             let n = self.name()?;
             self.expect_sym("=")?;
             let list = self.for_list()?;
             self.eat_kw("do");
+            // The controlled variable is known in the body of the cycle.
+            let noted = (!ext).then(|| self.note(NoteKind::Loop, at));
+            let from = self.pos;
             let body = self.basic()?;
+            if let Some(k) = noted {
+                self.notes[k].scope = (from, self.pos);
+            }
             if ext {
                 let hidden = format!("{} (for ext)", n);
                 let set = CmdKind::Assign(vec![Expr::Name(n, line)], vec![Expr::Name(hidden.clone(), line)]);
@@ -856,7 +1082,10 @@ impl Parser {
             }
             Tok::Kw(k) if k == "valof" || k == "refof" => {
                 self.next();
-                Ok(Expr::Valof(self.block()?, k == "refof", line))
+                self.open_frame();
+                let items = self.block()?;
+                self.close_frame();
+                Ok(Expr::Valof(items, k == "refof", line))
             }
             Tok::Sym("(") => {
                 self.next();

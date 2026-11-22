@@ -19,14 +19,21 @@ jobs:
       - name: Install wasmtime
         uses: bytecodealliance/actions/wasmtime/setup@v1
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Format
-        run: cargo fmt --check
+        run: cargo fmt --all --check
 
       - name: Lint
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
       - name: Test (native; the examples and every program in the tutorial)
         run: cargo test
+
+      - name: Test (the language server)
+        run: cargo test -p cpl-lsp
 
       - name: Test (WASI, inside wasmtime)
         run: cargo test --target wasm32-wasip1
@@ -34,7 +41,15 @@ jobs:
       - name: Native and WASI builds print the same thing
         run: scripts/wasi-check.sh
 
-      - name: Browser playground (the WASI host, in node)
+      - name: Browser playground (the WASI host and the language server, in node)
         run: |
           node web/build.mjs
           node web/test.mjs
+
+      - name: Visual Studio Code extension (grammar, language server, runner)
+        working-directory: editors/vscode
+        run: |
+          cargo build --release -p cpl-lsp
+          npm ci
+          npm run build
+          npm test

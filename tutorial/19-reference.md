@@ -117,6 +117,7 @@ applies to the parameters after it.
 cpl [OPTIONS] FILE.cpl      run a program
 cpl [OPTIONS] -e PROGRAM    run the program text given
 cpl [OPTIONS] -             read the program from standard input
+cpl --check FILE.cpl...     say what is wrong with each program, without running it
 
 --tokens         print the basic symbols instead of running
 --ast            print the syntax tree instead of running

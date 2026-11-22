@@ -1,0 +1,86 @@
+{
+  "name": "cpl-language",
+  "displayName": "CPL",
+  "description": "Syntax highlighting, a language server and a run button for CPL, the Combined Programming Language of 1962-66 and the ancestor of BCPL, B and C.",
+  "version": "0.1.0",
+  "publisher": "chrishayuk",
+  "license": "Apache-2.0",
+  "private": true,
+  "repository": { "type": "git", "url": "https://github.com/chrishayuk/cpl" },
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Linters"],
+  "keywords": ["cpl", "bcpl", "strachey", "retro", "language server"],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "cpl",
+        "aliases": ["CPL", "cpl"],
+        "extensions": [".cpl", ".pub"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      { "language": "cpl", "scopeName": "source.cpl", "path": "./syntaxes/cpl.tmLanguage.json" }
+    ],
+    "commands": [
+      { "command": "cpl.run", "title": "Run Program", "category": "CPL", "icon": "$(play)" },
+      { "command": "cpl.restartServer", "title": "Restart Language Server", "category": "CPL" }
+    ],
+    "menus": {
+      "editor/title/run": [{ "command": "cpl.run", "when": "resourceLangId == cpl" }],
+      "commandPalette": [
+        { "command": "cpl.run", "when": "editorLangId == cpl" },
+        { "command": "cpl.restartServer", "when": "editorLangId == cpl" }
+      ]
+    },
+    "keybindings": [
+      { "command": "cpl.run", "key": "ctrl+enter", "mac": "cmd+enter", "when": "editorTextFocus && editorLangId == cpl" }
+    ],
+    "taskDefinitions": [{ "type": "cpl" }],
+    "configuration": {
+      "title": "CPL",
+      "properties": {
+        "cpl.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a cpl-lsp program to use as the language server. Leave empty to use the one built into the extension."
+        },
+        "cpl.interpreter.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a cpl program to run programs with. Leave empty to use the one built into the extension."
+        },
+        "cpl.trace.server": {
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "off",
+          "description": "Log the messages exchanged with the language server."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "[cpl]": {
+        "editor.semanticHighlighting.enabled": true,
+        "editor.wordBasedSuggestions": "off"
+      }
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:vscode": "node test/vscode/run.mjs",
+    "package": "node build.mjs && vsce package --no-dependencies --skip-license"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.24.0",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.1.0"
+  }
+}

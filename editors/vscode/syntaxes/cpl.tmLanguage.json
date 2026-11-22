@@ -1,0 +1,323 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "CPL",
+  "scopeName": "source.cpl",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#logical"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#section"
+    },
+    {
+      "include": "#underlined"
+    },
+    {
+      "include": "#words"
+    },
+    {
+      "include": "#names"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.double-bar.cpl",
+      "match": "(\\|\\|).*$",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.comment.cpl"
+        }
+      }
+    },
+    "string": {
+      "name": "string.quoted.single.cpl",
+      "begin": "'",
+      "end": "'|$",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.cpl"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.cpl"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.cpl",
+          "match": "\\*[nstbNSTB'*|]"
+        },
+        {
+          "name": "invalid.illegal.escape.cpl",
+          "match": "\\*."
+        }
+      ]
+    },
+    "logical": {
+      "patterns": [
+        {
+          "name": "constant.numeric.binary.cpl",
+          "match": "(#b)(\\|)?[01]*",
+          "captures": {
+            "1": {
+              "name": "storage.type.radix.cpl"
+            },
+            "2": {
+              "name": "keyword.operator.bar.cpl"
+            }
+          }
+        },
+        {
+          "name": "constant.numeric.octal.cpl",
+          "match": "(#o)(\\|)?[0-7]*",
+          "captures": {
+            "1": {
+              "name": "storage.type.radix.cpl"
+            },
+            "2": {
+              "name": "keyword.operator.bar.cpl"
+            }
+          }
+        },
+        {
+          "name": "constant.numeric.hex.cpl",
+          "match": "(#x)(\\|)?[0-9A-Fa-f]*",
+          "captures": {
+            "1": {
+              "name": "storage.type.radix.cpl"
+            },
+            "2": {
+              "name": "keyword.operator.bar.cpl"
+            }
+          }
+        },
+        {
+          "name": "invalid.illegal.logical.cpl",
+          "match": "#"
+        }
+      ]
+    },
+    "number": {
+      "name": "constant.numeric.decimal.cpl",
+      "match": "(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:@[-+]?[0-9]+)?"
+    },
+    "section": {
+      "patterns": [
+        {
+          "match": "(\\$\\(|§(?!\\x{0338}))([A-Za-z0-9.]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.section.block.begin.cpl"
+            },
+            "2": {
+              "name": "entity.name.tag.section.cpl"
+            }
+          }
+        },
+        {
+          "match": "(\\$\\)|§\\x{0338})([A-Za-z0-9.]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.section.block.end.cpl"
+            },
+            "2": {
+              "name": "entity.name.tag.section.cpl"
+            }
+          }
+        },
+        {
+          "name": "punctuation.section.block.begin.cpl",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.section.block.end.cpl",
+          "match": "\\}"
+        }
+      ]
+    },
+    "underlined": {
+      "name": "keyword.other.underlined.cpl",
+      "match": "(?:[A-Za-z]\\x{0332})+"
+    },
+    "words": {
+      "patterns": [
+        {
+          "name": "keyword.control.result.cpl",
+          "match": "(?<![a-z])(?:(?:value|val|reference|ref)\\s+of|result\\s+(?:is|be)|valof|refof|resultis|resultbe)(?![a-z])"
+        },
+        {
+          "name": "keyword.control.jump.cpl",
+          "match": "(?<![a-z])(?:go\\s+to|goto|break|return|finish)(?![a-z])"
+        },
+        {
+          "name": "keyword.control.switch.cpl",
+          "match": "(?<![a-z])(?:(?:switch|jump)\\s+on|switchon|jumpon|caseswitch|into|case|default|the\\s+rest|others)(?![a-z])"
+        },
+        {
+          "name": "keyword.control.loop.cpl",
+          "match": "(?<![a-z])(?:repeat\\s+(?:while|until)|repeatwhile|repeatuntil|repeat|while|until|for|step|to|thru)(?![a-z])"
+        },
+        {
+          "name": "keyword.control.conditional.cpl",
+          "match": "(?<![a-z])(?:then\\s+do|or\\s+do|thendo|ordo|if|unless|then|do|test|or|else|otherwise)(?![a-z])"
+        },
+        {
+          "name": "keyword.other.definition.cpl",
+          "match": "(?<![a-z])(?:(?:all|both)\\s+be|allbe|bothbe|are)(?![a-z])"
+        },
+        {
+          "name": "support.type.primitive.cpl",
+          "match": "(?<![a-z])(?:double\\s+complex|long\\s+logical|doublecomplex|longlogical|real|integer|index|complex|double|logical|long|boolean|string|label|general|type|array|vector|matrix|list)(?![a-z])"
+        },
+        {
+          "name": "support.type.primitive.cpl",
+          "match": "Boolean(?![A-Za-z0-9]|\\.[A-Za-z0-9])"
+        },
+        {
+          "name": "storage.type.cpl",
+          "match": "(?<![a-z])(?:let|function|fn|routine|rt)(?![a-z])"
+        },
+        {
+          "name": "storage.modifier.cpl",
+          "match": "(?<![a-z])(?:recursive|rec|fixed|free|variable|var|constant|const|value|val|reference|ref|subst|external|ext)(?![a-z])"
+        },
+        {
+          "name": "constant.language.boolean.cpl",
+          "match": "(?<![a-z])(?:true|false)(?![a-z])"
+        },
+        {
+          "name": "variable.language.rhs.cpl",
+          "match": "(?<![a-z])(?:rhs)(?![a-z])"
+        },
+        {
+          "name": "keyword.other.cpl",
+          "match": "(?<![a-z])(?:be|is|and|in|where|all|both|prefer|sic|note|fix|load|update|of|result|go|switch|jump|on|the|rest)(?![a-z])"
+        }
+      ]
+    },
+    "names": {
+      "patterns": [
+        {
+          "match": "([A-Z](?:[A-Za-z0-9]|\\.(?=[A-Za-z0-9]))*'*)\\s*(:)(?!=)",
+          "captures": {
+            "1": {
+              "name": "entity.name.label.cpl"
+            },
+            "2": {
+              "name": "punctuation.separator.label.cpl"
+            }
+          }
+        },
+        {
+          "name": "constant.language.nil.cpl",
+          "match": "(?:NIL|Nil)(?![A-Za-z0-9']|\\.[A-Za-z0-9])"
+        },
+        {
+          "name": "support.function.cpl",
+          "match": "(?:DoubleComplex|LongLogical|Character|Formarray|WRITECHAR|Writechar|Initials|Longones|Newarray|READCHAR|Readchar|Boolean|Complex|Integer|Logical|Members|Newline|Append|Arccos|Arcsin|Arctan|Bounds|Double|Finals|Imagpt|LValue|Length|Lshift|Matrix|PRINTD|PRINTF|Printd|Printf|RValue|Realpt|Rotate|Rshift|String|Vector|Array|Equal|Field|First|Index|Intpt|List1|Round|Space|WRITE|Write|Atom|Cons|Copy|Frpt|Last|List|Mask|Null|Ones|Quot|READ|Read|Real|Sign|Sqrt|Type|Bit|Cos|Cpx|Exp|Fix|Log|Mod|Rem|Sin|Tan|Hd|Tl)(?![A-Za-z0-9']|\\.[A-Za-z0-9])"
+        },
+        {
+          "name": "entity.name.function.cpl",
+          "match": "[A-Z](?:[A-Za-z0-9]|\\.(?=[A-Za-z0-9]))*'*(?=\\s*\\[)"
+        },
+        {
+          "name": "variable.other.large.cpl",
+          "match": "[A-Z](?:[A-Za-z0-9]|\\.(?=[A-Za-z0-9]))*'*"
+        },
+        {
+          "name": "variable.other.small.cpl",
+          "match": "[a-z]'*"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.concatenation.cpl",
+          "match": "<=>"
+        },
+        {
+          "name": "keyword.operator.equivalence.cpl",
+          "match": "~==|==|≡|≢"
+        },
+        {
+          "name": "keyword.operator.assignment.cpl",
+          "match": ":="
+        },
+        {
+          "name": "keyword.operator.conditional.cpl",
+          "match": "->|→"
+        },
+        {
+          "name": "keyword.operator.comparison.cpl",
+          "match": "<=|>=|<<|>>|~=|\\\\=|≠|≤|≥"
+        },
+        {
+          "name": "keyword.operator.reference.cpl",
+          "match": "~~|≃"
+        },
+        {
+          "name": "keyword.operator.arithmetic.cpl",
+          "match": "\\*\\*|\\^|↑"
+        },
+        {
+          "name": "keyword.operator.logical.cpl",
+          "match": "/\\\\|\\\\/|∧|∨|~|¬|∼"
+        },
+        {
+          "name": "keyword.operator.arithmetic.cpl",
+          "match": "[-+*/×]"
+        },
+        {
+          "name": "keyword.operator.comparison.cpl",
+          "match": "[=<>]"
+        },
+        {
+          "name": "keyword.operator.range.cpl",
+          "match": "\\.(?: *\\.){2,}"
+        },
+        {
+          "name": "punctuation.section.brackets.begin.cpl",
+          "match": "\\["
+        },
+        {
+          "name": "punctuation.section.brackets.end.cpl",
+          "match": "\\]"
+        },
+        {
+          "name": "punctuation.section.parens.begin.cpl",
+          "match": "\\("
+        },
+        {
+          "name": "punctuation.section.parens.end.cpl",
+          "match": "\\)"
+        },
+        {
+          "name": "punctuation.separator.comma.cpl",
+          "match": ","
+        },
+        {
+          "name": "punctuation.terminator.cpl",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.label.cpl",
+          "match": ":"
+        }
+      ]
+    }
+  }
+}

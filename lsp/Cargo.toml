@@ -1,0 +1,10 @@
+[package]
+name = "cpl-lsp"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "A language server for CPL, the Combined Programming Language of 1962-66"
+
+[dependencies]
+cpl = { path = ".." }
+serde_json = "1"

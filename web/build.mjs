@@ -1,12 +1,14 @@
 // Builds the files the playground needs:  node web/build.mjs
 //   web/cpl.wasm       the CPL system, compiled for WASI
+//   web/cpl-lsp.wasm   the language server, compiled for WASI
 //   web/examples.json  the example programs, with their input
 import { execSync } from "node:child_process";
 import { copyFileSync, existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 
 const root = new URL("..", import.meta.url).pathname;
-execSync("cargo build --release --target wasm32-wasip1", { cwd: root, stdio: "inherit" });
+execSync("cargo build --release --target wasm32-wasip1 -p cpl -p cpl-lsp", { cwd: root, stdio: "inherit" });
 copyFileSync(`${root}target/wasm32-wasip1/release/cpl.wasm`, `${root}web/cpl.wasm`);
+copyFileSync(`${root}target/wasm32-wasip1/release/cpl-lsp.wasm`, `${root}web/cpl-lsp.wasm`);
 
 // Shown first, in this order; the rest follow alphabetically.
 const first = ["hello", "factorial", "manual-hcf", "fibonacci", "lvalues", "fixed-and-free", "lh-functions",
@@ -33,4 +35,4 @@ examples.splice(first.length, 0, {
   input: readFileSync(`${root}appendix1/sample.pub`, "utf8"),
 });
 writeFileSync(`${root}web/examples.json`, JSON.stringify(examples));
-console.log(`web/cpl.wasm and web/examples.json (${examples.length} programs) written`);
+console.log(`web/cpl.wasm, web/cpl-lsp.wasm and web/examples.json (${examples.length} programs) written`);

@@ -27,9 +27,38 @@ pub struct Token {
     pub line: u32,
     /// True when this token is the first on its line.
     pub nl: bool,
+    /// Where the token is in the text, as byte offsets.
+    pub start: usize,
+    pub end: usize,
 }
 
-const WORDS: &[&str] = &[
+/// A mistake in the text of a program, and where it is.
+#[derive(Clone, Debug)]
+pub struct LexError {
+    /// A short stable name for the kind of mistake.
+    pub code: &'static str,
+    /// As the system reports it, beginning with the line number.
+    pub message: String,
+    pub start: usize,
+    pub end: usize,
+}
+
+/// Everything the lexer can say about a text, right or wrong.
+pub struct Scan {
+    /// The basic symbols, as the parser takes them.
+    pub tokens: Vec<Token>,
+    /// The same before two-word symbols are joined and synonyms reduced:
+    /// one entry for each word as it was written.
+    pub words: Vec<Token>,
+    /// Where the comments are.
+    pub comments: Vec<(usize, usize)>,
+    /// The mistakes, in the order they are met.
+    pub errors: Vec<LexError>,
+    /// The opening section brackets that are never closed.
+    pub unclosed: Vec<(usize, usize)>,
+}
+
+pub const WORDS: &[&str] = &[
     "let",
     "be",
     "is",
@@ -132,7 +161,7 @@ const WORDS: &[&str] = &[
 ];
 
 /// Pairs of words that make one basic symbol ("spaces are ignored").
-const COMBOS: &[(&str, &str, &str)] = &[
+pub const COMBOS: &[(&str, &str, &str)] = &[
     ("go", "to", "goto"),
     ("value", "of", "valof"),
     ("val", "of", "valof"),
@@ -154,7 +183,7 @@ const COMBOS: &[(&str, &str, &str)] = &[
 ];
 
 /// Synonyms, reduced to the form used in the syntax tables (3.1.3 d).
-const SYNONYMS: &[(&str, &str)] = &[
+pub const SYNONYMS: &[(&str, &str)] = &[
     ("is", "be"),
     ("are", "allbe"),
     ("bothbe", "allbe"),
@@ -210,10 +239,28 @@ fn word(w: &str) -> Option<&'static str> {
     WORDS.iter().find(|k| **k == w).copied()
 }
 
+/// The basic symbols of a program, or the first mistake in its text.
 pub fn lex(src: &str) -> Result<Vec<Token>, String> {
+    let scan = scan(src);
+    match scan.errors.into_iter().next() {
+        Some(e) => Err(e.message),
+        None => Ok(scan.tokens),
+    }
+}
+
+/// Reads the whole text whether or not it is right. After a mistake the
+/// lexer notes it and carries on, so that an editor can still be told about
+/// the rest of the program (see `analysis.rs`).
+pub fn scan(src: &str) -> Scan {
     let cs: Vec<char> = src.chars().collect();
+    // The byte offset of each character, and of the end of the text.
+    let mut offs: Vec<usize> = src.char_indices().map(|(at, _)| at).collect();
+    offs.push(src.len());
     let mut out: Vec<Token> = Vec::new();
-    let mut tags: Vec<String> = Vec::new();
+    let mut comments: Vec<(usize, usize)> = Vec::new();
+    let mut errors: Vec<LexError> = Vec::new();
+    // The tag of each open section, and where its bracket is.
+    let mut tags: Vec<(String, usize, usize)> = Vec::new();
     let (mut i, mut line, mut nl) = (0usize, 1u32, true);
     let tagch = |c: char| c.is_ascii_alphanumeric() || c == '.';
     while i < cs.len() {
@@ -229,14 +276,32 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
             continue;
         }
         if c == '|' && cs.get(i + 1) == Some(&'|') {
+            let st = i;
             while i < cs.len() && cs[i] != '\n' {
                 i += 1;
             }
+            comments.push((offs[st], offs[i]));
             continue;
         }
+        // Where this symbol starts, and how many came before it.
+        let (st0, n0) = (i, out.len());
         let mut push = |tok: Tok, nl: &mut bool| {
-            out.push(Token { tok, line, nl: *nl });
+            out.push(Token {
+                tok,
+                line,
+                nl: *nl,
+                start: 0,
+                end: 0,
+            });
             *nl = false;
+        };
+        let mut fail = |code: &'static str, message: String, from: usize, to: usize| {
+            errors.push(LexError {
+                code,
+                message: format!("line {}: {}", line, message),
+                start: offs[from],
+                end: offs[to.min(cs.len())],
+            });
         };
         let primes = |i: &mut usize, s: &mut String| {
             while *i < cs.len() && cs[*i] == '\'' {
@@ -254,12 +319,12 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
             }
             match word(&w) {
                 Some(k) => push(Tok::Kw(k), &mut nl),
-                None => {
-                    return Err(format!(
-                        "line {}: the underlined word {} is not a basic symbol",
-                        line, w
-                    ))
-                }
+                None => fail(
+                    "not-a-basic-symbol",
+                    format!("the underlined word {} is not a basic symbol", w),
+                    st0,
+                    i,
+                ),
             }
         } else if c.is_ascii_lowercase() {
             let st = i;
@@ -277,6 +342,11 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                         primes(&mut i, &mut s);
                     }
                     push(Tok::Name(s), &mut nl);
+                }
+                // Each letter is a name of its own, with its own place.
+                for (k, t) in out[n0..].iter_mut().enumerate() {
+                    t.start = offs[st + k];
+                    t.end = if k == n - 1 { offs[i] } else { offs[st + k + 1] };
                 }
             }
         } else if c.is_ascii_uppercase() {
@@ -324,37 +394,56 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                 i += 1;
             }
             if cs[st..i].iter().filter(|d| **d == '.').count() < 3 {
-                return Err(format!(
-                    "line {}: a stray dot (a dot string needs at least three dots)",
-                    line
-                ));
+                fail(
+                    "stray-dot",
+                    "a stray dot (a dot string needs at least three dots)".into(),
+                    st,
+                    st + 1,
+                );
+            } else {
+                push(Tok::Sym("..."), &mut nl);
             }
-            push(Tok::Sym("..."), &mut nl);
         } else if c == '\'' {
             let mut s = String::new();
             i += 1;
             loop {
                 match cs.get(i) {
-                    None | Some('\n') => return Err(format!("line {}: string constant has no closing quote", line)),
-                    Some('\'') => break,
+                    None | Some('\n') => {
+                        fail("unclosed-string", "string constant has no closing quote".into(), st0, i);
+                        break;
+                    }
+                    Some('\'') => {
+                        i += 1;
+                        break;
+                    }
                     Some('*') => {
                         i += 1;
-                        s.push(match cs.get(i).map(|e| e.to_ascii_lowercase()) {
-                            Some('n') => '\n',
-                            Some('s') => ' ',
-                            Some('t') => '\t',
-                            Some('b') => '\u{8}',
-                            Some('\'') => '\'',
-                            Some('*') => '*',
-                            Some('|') => '|',
-                            e => return Err(format!("line {}: unknown string escape *{}", line, e.unwrap_or(' '))),
-                        });
+                        match cs.get(i).map(|e| e.to_ascii_lowercase()) {
+                            Some('n') => s.push('\n'),
+                            Some('s') => s.push(' '),
+                            Some('t') => s.push('\t'),
+                            Some('b') => s.push('\u{8}'),
+                            Some('\'') => s.push('\''),
+                            Some('*') => s.push('*'),
+                            Some('|') => s.push('|'),
+                            e => {
+                                fail(
+                                    "bad-escape",
+                                    format!("unknown string escape *{}", e.unwrap_or(' ')),
+                                    i - 1,
+                                    i + 1,
+                                );
+                                if matches!(e, None | Some('\n')) {
+                                    // The string ends here too, unclosed.
+                                    continue;
+                                }
+                            }
+                        }
                     }
                     Some(ch) => s.push(*ch),
                 }
                 i += 1;
             }
-            i += 1;
             push(Tok::Str(s), &mut nl);
         } else if c == '#' {
             let radix = match cs.get(i + 1) {
@@ -362,10 +451,14 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                 Some('o') => 8,
                 Some('x') => 16,
                 _ => {
-                    return Err(format!(
-                        "line {}: a logical constant is written #b..., #o... or #x...",
-                        line
-                    ))
+                    fail(
+                        "bad-logical",
+                        "a logical constant is written #b..., #o... or #x...".into(),
+                        i,
+                        i + 1,
+                    );
+                    i += 1;
+                    continue;
                 }
             };
             i += 2;
@@ -380,14 +473,25 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                 i += 1;
             }
             let digits: String = cs[st..i].iter().collect();
-            let mut bits = u64::from_str_radix(&digits, radix)
-                .map_err(|_| format!("line {}: badly formed logical constant", line))?;
+            let mut bits = match u64::from_str_radix(&digits, radix) {
+                Ok(bits) => bits,
+                Err(_) => {
+                    fail("bad-logical", "badly formed logical constant".into(), st0, i);
+                    0
+                }
+            };
             if barred {
                 let used = digits.len() as u32 * radix.trailing_zeros();
                 if used > 24 {
-                    return Err(format!("line {}: a barred logical constant has at most 24 bits", line));
+                    fail(
+                        "bad-logical",
+                        "a barred logical constant has at most 24 bits".into(),
+                        st0,
+                        i,
+                    );
+                } else {
+                    bits <<= 24 - used;
                 }
-                bits <<= 24 - used;
             }
             push(Tok::Bits(bits), &mut nl);
         } else if c == '{'
@@ -401,7 +505,7 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                     i += 1;
                 }
             }
-            tags.push(cs[st..i].iter().collect());
+            tags.push((cs[st..i].iter().collect(), offs[st0], offs[i]));
             push(Tok::Open, &mut nl);
         } else if c == '}' || (c == '$' && cs.get(i + 1) == Some(&')')) || c == SECTION {
             i += if c == '}' { 1 } else { 2 };
@@ -414,20 +518,32 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
             let tag: String = cs[st..i].iter().collect();
             if tag.is_empty() {
                 if tags.pop().is_none() {
-                    return Err(format!("line {}: closing section bracket with nothing to close", line));
+                    fail(
+                        "unmatched-bracket",
+                        "closing section bracket with nothing to close".into(),
+                        st0,
+                        i,
+                    );
+                } else {
+                    push(Tok::Close, &mut nl);
                 }
-                push(Tok::Close, &mut nl);
             } else {
                 // A tagged closing bracket also closes every section opened
                 // since its matching opening bracket (2.1.3).
-                let at = tags
-                    .iter()
-                    .rposition(|t| *t == tag)
-                    .ok_or_else(|| format!("line {}: no open section bracket is tagged {}", line, tag))?;
-                for _ in at..tags.len() {
-                    push(Tok::Close, &mut nl);
+                match tags.iter().rposition(|t| t.0 == tag) {
+                    Some(at) => {
+                        for _ in at..tags.len() {
+                            push(Tok::Close, &mut nl);
+                        }
+                        tags.truncate(at);
+                    }
+                    None => fail(
+                        "unknown-tag",
+                        format!("no open section bracket is tagged {}", tag),
+                        st0,
+                        i,
+                    ),
                 }
-                tags.truncate(at);
             }
         } else if let Some((_, s)) = UNICODE.iter().find(|(u, _)| *u == c) {
             i += 1;
@@ -444,21 +560,52 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
                     };
                     push(Tok::Sym(s), &mut nl);
                 }
-                None => return Err(format!("line {}: the character '{}' has no meaning here", line, c)),
+                None => {
+                    fail(
+                        "bad-character",
+                        format!("the character '{}' has no meaning here", c),
+                        i,
+                        i + 1,
+                    );
+                    i += 1;
+                }
+            }
+        }
+        for t in &mut out[n0..] {
+            if t.end == 0 {
+                (t.start, t.end) = (offs[st0], offs[i]);
             }
         }
     }
-    if !tags.is_empty() {
-        return Err(format!(
-            "line {}: {} section bracket(s) left open at the end of the program",
+    let unclosed: Vec<(usize, usize)> = tags.iter().map(|t| (t.1, t.2)).collect();
+    if let Some(&(start, end)) = unclosed.last() {
+        errors.push(LexError {
+            code: "unclosed-bracket",
+            message: format!(
+                "line {}: {} section bracket(s) left open at the end of the program",
+                line,
+                tags.len()
+            ),
+            start,
+            end,
+        });
+    }
+    // Carrying on after that mistake means closing them here.
+    for _ in &unclosed {
+        out.push(Token {
+            tok: Tok::Close,
             line,
-            tags.len()
-        ));
+            nl: true,
+            start: src.len(),
+            end: src.len(),
+        });
     }
     out.push(Token {
         tok: Tok::Eof,
         line,
         nl: true,
+        start: src.len(),
+        end: src.len(),
     });
 
     // Join two-word basic symbols, then reduce synonyms.
@@ -471,6 +618,7 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
             if let Some((_, _, to)) = COMBOS.iter().find(|(x, y, _)| x == a && y == b) {
                 if same_line || !a.starts_with("repeat") {
                     t.tok = Tok::Kw(to);
+                    t.end = out[k + 1].end;
                     k += 1;
                 }
             }
@@ -483,7 +631,13 @@ pub fn lex(src: &str) -> Result<Vec<Token>, String> {
         joined.push(t);
         k += 1;
     }
-    Ok(joined)
+    Scan {
+        tokens: joined,
+        words: out,
+        comments,
+        errors,
+        unclosed,
+    }
 }
 
 /// The program as it would be printed: basic symbols underlined, section

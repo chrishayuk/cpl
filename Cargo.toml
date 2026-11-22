@@ -2,6 +2,7 @@
 name = "cpl"
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
 description = "CPL (Combined Programming Language, Cambridge and London 1962-66): the ancestor of BCPL, B and C, implemented from the 1966 Working Papers"
 
 [lib]
@@ -13,6 +14,12 @@ name = "cpl"
 path = "src/main.rs"
 
 [dependencies]
+
+# The language server has its own crate so that the system keeps no
+# dependencies. `cargo build` here builds only the system.
+[workspace]
+members = ["lsp"]
+default-members = ["."]
 
 [profile.release]
 opt-level = 3

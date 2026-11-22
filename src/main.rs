@@ -4,17 +4,60 @@ use std::process::exit;
 const USAGE: &str = "Usage: cpl [OPTIONS] <FILE.cpl>
        cpl [OPTIONS] -e <PROGRAM>
        cpl [OPTIONS] -            (the program is read from standard input)
+       cpl --check <FILE.cpl>...  (- for standard input)
 
 Options:
   -e, --eval <PROGRAM> Run the program text given on the command line
       --tokens         Print the basic symbols instead of running
       --ast            Print the syntax tree instead of running
       --code           Print the abstract machine code instead of running
+      --publication    Print the program as it would be printed: underlined
+                       basic symbols, section signs, mathematical signs
       --max-steps <N>  Stop with an error after N machine steps
+      --check          Report what is wrong with each program, with line and
+                       column, without running it
   -h, --help           Show this help
   -V, --version        Show the version";
 
+/// `cpl --check FILE...`: report mistakes without running anything. The
+/// status is 1 if any program has an error, and 2 if one cannot be read.
+fn check(files: &[String]) -> i32 {
+    if files.is_empty() {
+        eprintln!("cpl: --check needs a file\n\n{}", USAGE);
+        return 2;
+    }
+    let mut status = 0;
+    for file in files {
+        let (name, read) = if file == "-" {
+            ("program", std::io::read_to_string(std::io::stdin()))
+        } else {
+            (file.as_str(), std::fs::read_to_string(file))
+        };
+        let src = match read {
+            Ok(src) => src,
+            Err(e) => {
+                eprintln!("cpl: cannot read {}: {}", file, e);
+                status = 2;
+                continue;
+            }
+        };
+        let result = cpl::analysis::analyse(&src);
+        for d in &result.diagnostics {
+            let (line, column) = cpl::analysis::line_column(&src, d.start);
+            println!("{}:{}:{}: {}: {}", name, line, column, d.severity.name(), d.message);
+        }
+        if result.has_errors() && status == 0 {
+            status = 1;
+        }
+    }
+    status
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("--check") {
+        exit(check(&args[1..]));
+    }
     let mut file = None;
     let mut text = None;
     let (mut tokens, mut ast, mut code, mut max_steps) = (false, false, false, None);
