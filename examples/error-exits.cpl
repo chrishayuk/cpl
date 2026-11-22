@@ -1,0 +1,19 @@
+|| Labels as parameters. CPL has no exceptions, and needs none: a routine
+|| that can fail is given a label to go to, and the jump leaves however
+|| many activations lie between. Here the failure is found three calls
+|| down, inside a recursive function.
+
+let rec Sum[general l, label Bad] =
+        Null[l] -> 0,
+        value of $( unless Type[Hd[l]] = index go to Bad
+                    result is Hd[l] $) + Sum[Tl[l], Bad]
+
+let rt Try[general l] be
+   $( Write[l, ': ']
+      Write['the sum is ', Sum[l, Fail], '*n']
+      return
+Fail: Write['not all numbers*n'] $)
+
+Try[List[1, 2, 3, 4]]
+Try[List[1, 2, 'three', 4]]
+Try[NIL]

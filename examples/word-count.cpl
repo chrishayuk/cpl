@@ -1,0 +1,17 @@
+|| Count the lines, words and characters of the input, a character at a
+|| time. Readchar gives the empty string when the input is exhausted.
+
+let Lines, Words, Chars be index
+Lines, Words, Chars := 0, 0, 0
+let c = ''
+let Inword = false
+
+$( Readchar[c]
+   if c = '' break
+   Chars := Chars + 1
+   if c = '*n' do Lines := Lines + 1
+   test c = ' ' \/ c = '*n' \/ c = '*t'
+      then Inword := false
+      or unless Inword do Words, Inword := Words + 1, true $) repeat
+
+Write[Lines, ' lines, ', Words, ' words, ', Chars, ' characters*n']

@@ -1,0 +1,28 @@
+|| Euler's transformation of a slowly convergent alternating series, from
+|| "The Main Features of CPL" (1963), who took it from the ALGOL Report.
+|| Rewritten in the notation of 1966: definitions by let, value of ...
+|| result is, and Newarray for the 1963 function Array.
+
+let Euler[function f, real e, integer t] = value of
+   $(1 let i, n, c be integer
+       let m = Newarray[real, (0, 15)]
+       let u, d, s be real
+       i, n, c, m[0] := 0, 0, 0, f[0]
+       s := m[0]/2
+       $(1.2 i := i + 1
+             u := f[i]
+             for k = step 0, 1, n do
+                m[k], u := u, (u + m[k])/2
+             test Mod[u] < Mod[m[n]] /\ n < 15
+                then do d, n, m[n + 1] := u/2, n + 1, u
+                or do d := u
+             s := s + d
+             c := (Mod[d] < e) -> c + 1, 0 $)1.2
+       repeat while c < t
+       result is s $)1
+
+|| 1 - 1/3 + 1/5 - 1/7 + ...  =  pi/4
+let Leibniz[k] = (Rem[k, 2] = 0 -> 1, -1) / (2k + 1)
+
+Write['4 Euler[Leibniz] = ', 4 Euler[Leibniz, 1@-10, 2], '*n']
+Write['4 Arctan[1]      = ', 4 Arctan[1], '*n']

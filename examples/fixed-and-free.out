@@ -1,0 +1,1 @@
+! line 23: Count is a free variable of the fixed function Bad, which may not assign to it (a function defined with == is free and may)

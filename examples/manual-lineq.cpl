@@ -1,0 +1,31 @@
+|| Section 20.1 of the Elementary Programming Manual: "Suppose we wish at
+|| various points in a program to solve the equations
+||        ax + by = c
+||        a'x + b'y = c'
+|| with a jump to a specified label if there is no solution."
+||
+|| The routine is as printed, with the corrections made by hand on the
+|| copy that survives: x and y are called by reference (ref), the label
+|| by value (val). 1@-6 is how one part in a million is written here.
+
+routine LINEQ[real a, b, c, a', b', c', ref x, y, val label L] be
+$( let DET = ab' - a'b
+   if Mod[DET] < 1@-6 go to L
+   x := (cb' - c'b)/DET
+   y := (ac' - a'c)/DET $)
+
+|| "Thus the command LINEQ[1,2,3,4,5,6,V,W,ERROR] will solve the equations
+||        V + 2W = 3
+||       4V + 5W = 6
+|| assign the solution to V, W and send control to the label ERROR if
+|| there is no solution."
+let V, W = 0, 0
+LINEQ[1, 2, 3, 4, 5, 6, V, W, ERROR]
+Write['V = ', V, '   W = ', W, '*n']
+
+|| Two parallel lines.
+LINEQ[1, 2, 3, 2, 4, 7, V, W, ERROR]
+Write['this line is not reached*n']
+finish
+
+ERROR: Write['no solution*n']

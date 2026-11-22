@@ -1,0 +1,11 @@
+3 is of type index
+2.5 is of type real
+three is of type string
+true is of type Boolean
+<basic function Sqrt> is of type function
+real is of type type
+(1, 2) is of type list
+the string abc, no, a list, a number
+3 3.5 (1.0, 1.0)
+7 is of type integer
+! line 31: alarm: the real number 7.5 is not integral (use Round or Intpt to make an integer of it) (in main program)

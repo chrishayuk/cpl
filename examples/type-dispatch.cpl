@@ -1,0 +1,22 @@
+|| A list may hold data items of any type, and a general variable carries
+|| the type of whatever it holds. This routine describes anything.
+
+let rec rt Describe[general x, index d] be
+   $( let t = Type[x]
+      Space[3d]
+      test t = list
+         then $( Write['a list of ', Length[x], '*n']
+                 until Null[x] do
+                    $( Describe[Hd[x], d + 1]
+                       x := Tl[x] $) $)
+         or Write[(t = string -> 'the string ',
+                   t = Boolean -> 'the truth value ',
+                   t = index \/ t = integer -> 'the whole number ',
+                   t = real -> 'the real number ',
+                   t = complex -> 'the complex number ',
+                   t = logical -> 'the bit pattern ',
+                   t = function -> 'a function: ',
+                   t = type -> 'the type ',
+                   'something else: '), x, '*n'] $)
+
+Describe[List[1966, 'CPL', 2.5, true, Cpx[0, 1], #o777, Sqrt, real, List['a', List['b']], NIL], 0]

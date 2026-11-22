@@ -1,0 +1,23 @@
+|| Read numbers until a zero, and say something about them. Read takes
+|| its parameter by reference and puts the next number of the input
+|| stream into it.
+
+let n, x, s, q = 0, 0, 0, 0
+let Least, Most = 0, 0
+
+$( Read[x]
+   if x = 0 break
+   if n = 0 do Least, Most := x, x
+   if x < Least do Least := x
+   if x > Most do Most := x
+   n, s, q := n + 1, s + x, q + x x $) repeat
+
+test n = 0
+   then Write['no numbers*n']
+   or $( let Mean = s/n
+         Write['count      ', n, '*n']
+         Write['sum        ', s, '*n']
+         Write['least      ', Least, '*n']
+         Write['greatest   ', Most, '*n']
+         Write['mean       ', Mean, '*n']
+         Write['deviation  ', Sqrt[q/n - Mean Mean], '*n'] $)

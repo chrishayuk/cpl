@@ -1,0 +1,63 @@
+|| Arrays (Reference Manual, section 11). An array is "a particular sort
+|| of function, of one index parameter"; storage is made by a function
+|| call, not by a declaration, and an array value is best thought of as
+|| a pointer to its elements.
+
+|| Newarray[type, bounds ...] makes the storage.
+let a = Newarray[real, (1, 3), (1, 3)]
+for i = 1 to 3 do
+   for j = 1 to 3 do a[i, j] := 10i + j
+
+|| A[i, j] is synonymous with A[i][j]; A[i] is itself an array.
+let r ~~ a[2]
+Write['a[2, 3] = ', a[2, 3], '   a[2][3] = ', a[2][3], '   r[3] = ', r[3], '*n']
+
+|| Formarray[type, bounds ...] gives a function that forms an array from
+|| its elements, taken in lexicographic order of subscript.
+let b = Formarray[real, (1, 3), (1, 3)][1, 0, 0,
+                                        0, 2, 0,
+                                        0, 0, 3]
+
+let rt Print[matrix m] be
+   $( let p, q = Bounds[m]
+      for i = step p, 1, q do
+         $( for j = step p, 1, q do Write[m[i, j], '  ']
+            Write['*n'] $) $)
+
+|| Matrix product (Elementary Programming Manual, section 14).
+let Mult[matrix x, y, index n] = value of
+   $( let z = Newarray[real, (1, n), (1, n)]
+      for i = 1 to n do
+         for j = 1 to n do
+            $( let s = 0
+               for k = 1 to n do s := s + x[i, k] y[k, j]
+               z[i, j] := s $)
+      result is z $)
+
+Write['the product a b:*n']
+Print[Mult[a, b, 3]]
+
+|| "No automatic copying of arrays is done on assignment."
+let v = Formarray[index, (0, 4)][1, 2, 3, 4, 5]
+let w = v
+let c = Copy[v]
+w[0] := 99
+Write['v[0] = ', v[0], '   c[0] = ', c[0], '*n']
+Write['w = v: ', w = v, '   c = v: ', c = v, '   Equal[c, v]: ', Equal[c, v], '*n']
+c[0] := 99
+Write['after c[0] := 99   c = v: ', c = v, '   Equal[c, v]: ', Equal[c, v], '*n']
+
+|| Arrays need not be rectangular: a triangle of binomial coefficients.
+let t = Newarray[general, (0, 6)]
+for n = 0 to 6 do
+   $( t[n] := Newarray[integer, (0, n)]
+      t[n][0], t[n][n] := 1, 1
+      for k = step 1, 1, n - 1 do t[n][k] := t[n - 1][k - 1] + t[n - 1][k] $)
+for n = 0 to 6 do
+   $( for k = 0 to n do Write[t[n][k], ' ']
+      Write['*n'] $)
+
+|| A fixed array has unalterable elements; the subscript is checked.
+let f = Fix[v]
+Write['f[4] = ', f[4], '*n']
+v[5] := 0

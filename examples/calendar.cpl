@@ -1,0 +1,31 @@
+|| A calendar for the month in which the CPL Working Papers were issued,
+|| with the day of the week from Zeller's congruence.
+
+prefer integer
+
+let Leap[y] = Rem[y, 4] = 0 /\ (Rem[y, 100] ~= 0 \/ Rem[y, 400] = 0)
+let Days[m, y] = m = 2 -> (Leap[y] -> 29, 28),
+                 m = 4 \/ m = 6 \/ m = 9 \/ m = 11 -> 30,
+                 31
+
+|| 0 for Sunday ... 6 for Saturday.
+let Weekday[d, m, y] = value of
+   $( if m < 3 do m, y := m + 12, y - 1
+      let k, j = Rem[y, 100], Quot[y, 100]
+      result is Rem[d + Quot[13(m + 1), 5] + k + Quot[k, 4] + Quot[j, 4] + 5j + 6, 7] $)
+
+let Name = Formarray[string, (1, 12)]['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                                      'August', 'September', 'October', 'November', 'December']
+
+let rt Month[m, y] be
+   $( Write['    ', Name[m], ' ', y, '*n Su Mo Tu We Th Fr Sa*n']
+      let w = Weekday[1, m, y]
+      Space[3w]
+      for d = 1 to Days[m, y] do
+         $( Printd[d, 2, 0]
+            if Rem[w + d, 7] = 0 do Write['*n'] $)
+      Write['*n'] $)
+
+Month[7, 1966]
+Write['*n']
+Month[2, 1964]

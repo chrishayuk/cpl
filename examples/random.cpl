@@ -1,0 +1,20 @@
+|| Random numbers from a linear congruence, kept in a private variable
+|| with "in", and used to find pi by throwing darts at a square.
+
+prefer integer
+
+let Seed = 1966 in
+    Random[] == value of
+       $( Seed := Rem[1103515245 Seed + 12345, 2147483648]
+          result is Seed/2147483648 $)
+
+Write['five random numbers:']
+for i = 1 to 5 do Printd[Random[], 2, 4]
+Write['*n']
+
+let Hits, n = 0, 20000
+for i = 1 to n do
+   $( let x, y = Random[], Random[]
+      if x x + y y < 1 do Hits := Hits + 1 $)
+Write[Hits, ' of ', n, ' darts landed in the quarter circle*n']
+Write['pi is roughly ', 4Hits/n, '*n']

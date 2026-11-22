@@ -1,0 +1,8 @@
+a, b, c = 2.0, 2.0, 1.0
+a, b = 10.0, 11.0
+after Byvalue[a]  a = 3.0
+after Byref[a]    a = 1.0
+p, q = 99.0, 20.0
+q = 77.0
+k = 2.0
+! line 44: assignment to a constant (in main program)

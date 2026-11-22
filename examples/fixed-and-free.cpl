@@ -1,0 +1,24 @@
+|| Fixed and free functions (Reference Manual 10.3.4; Elementary Manual,
+|| 1966 revision). A function defined by = is FIXED: the R-values of its
+|| free variables are taken when it is defined. A function defined by ==
+|| (printed as three bars) is FREE: it shares the L-values of its free
+|| variables and sees their values at the time of the call.
+
+$( let a, b, c be real
+   a, b, c := 2, 3, 4
+   let w, z both be real
+   let f[x] = a x x + b x + c
+   let g[x] == a x x + b x + c
+   a, b, c := 5, 6, 7
+   w, z := f[1], g[1]
+   Write['fixed f[1] = ', w, '   (2 + 3 + 4)*n']
+   Write['free  g[1] = ', z, '  (5 + 6 + 7)*n'] $)
+
+|| A free function may assign to its free variables; a fixed one may not.
+let Count = 0
+let Tick[] == value of $( Count := Count + 1; result is Count $)
+Tick[]; Tick[]
+Write['Count = ', Count, '*n']
+
+let Bad[] = value of $( Count := 0; result is Count $)
+Bad[]

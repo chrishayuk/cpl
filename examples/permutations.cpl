@@ -1,0 +1,30 @@
+|| All the permutations of a list, and all its sublists.
+
+prefer general
+
+let rec Map[f, l] = Null[l] -> NIL, Cons[f[Hd[l]], Map[f, Tl[l]]]
+let rec Join[a, b] = Null[a] -> b, Cons[Hd[a], Join[Tl[a], b]]
+let rec Flatten[l] = Null[l] -> NIL, Join[Hd[l], Flatten[Tl[l]]]
+let rec Without[x, l] = Null[l] -> NIL,
+                        Hd[l] = x -> Tl[l],
+                        Cons[Hd[l], Without[x, Tl[l]]]
+
+|| For each member x: x followed by each permutation of the rest.
+let rec Perms[l] = Null[l] -> List1[NIL],
+                   Flatten[Map[Starting, l]]
+                   where Starting[x] = Map[Put, Perms[Without[x, l]]]
+                                       where Put[p] = Cons[x, p]
+
+|| The sublists of the tail, without the head and then with it.
+let rec Sublists[l] = Null[l] -> List1[NIL],
+                      (Join[s, Map[Put, s]] where s = Sublists[Tl[l]]
+                                            and Put[p] = Cons[Hd[l], p])
+
+let rt Show[l] be
+   until Null[l] do
+      $( Write[Hd[l], '*n']
+         l := Tl[l] $)
+
+Show[Perms[List['c', 'p', 'l']]]
+Write[Length[Perms[List[1, 2, 3, 4, 5]]], ' permutations of five things*n']
+Write[Sublists[List[1, 2, 3]], '*n']

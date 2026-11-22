@@ -1,0 +1,7 @@
+Double[21]                   = 42
+Compose[Double, Succ][4]     = 10
+Compose[Succ, Double][4]     = 9
+Power[Double, 10][1]         = 1024
+Power[Sqrt, 3][256]          = 2.0
+Deriv[Sin][0]                = 0.999999999983
+Deriv[Deriv[Cube]][2]        = 11.9999987724

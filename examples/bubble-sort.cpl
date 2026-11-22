@@ -1,0 +1,22 @@
+|| Bubble sort. An array value is a pointer to its elements, so the
+|| routine sorts the caller's array although v is called by value.
+
+let rt Sort[vector v] be
+   $( let a, b = Bounds[v]
+      let Swapped = true
+      while Swapped do
+         $( Swapped := false
+            for i = step a, 1, b - 1 do
+               if v[i] > v[i + 1] do
+                  $( v[i], v[i + 1] := v[i + 1], v[i]
+                     Swapped := true $) $) $)
+
+let rt Show[vector v] be
+   $( let a, b = Bounds[v]
+      for i = step a, 1, b do Write[v[i], ' ']
+      Write['*n'] $)
+
+let v = Formarray[index, (1, 10)][31, 41, 59, 26, 53, 58, 97, 93, 23, 84]
+Show[v]
+Sort[v]
+Show[v]

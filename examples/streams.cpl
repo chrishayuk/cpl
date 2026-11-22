@@ -1,0 +1,30 @@
+|| Lists without end. A stream is a pair: a first member, and a function
+|| that will produce the rest when it is asked. Nothing is worked out
+|| until it is wanted, so the list of all the primes can be written down.
+
+prefer general
+
+let Head[s] = Hd[s]
+let Rest[s] = Hd[Tl[s]][]
+
+let rec From[n] = List[n, Later] where Later[] = From[n + 1]
+
+let rec Keep[p, s] = p[Head[s]] -> (List[Head[s], Later] where Later[] = Keep[p, Rest[s]]),
+                     Keep[p, Rest[s]]
+
+let rec Map[f, s] = List[f[Head[s]], Later] where Later[] = Map[f, Rest[s]]
+
+|| The sieve: the first number is prime; strike its multiples from the rest.
+let rec Sieve[s] = List[Head[s], Later]
+                   where Later[] = Sieve[Keep[Coprime, Rest[s]]]
+                                   where Coprime[n] = Rem[n, Head[s]] ~= 0
+
+let rec rt Show[n, s] be
+   test n = 0 then Write['...*n']
+   or $( Write[Head[s], ' ']
+         Show[n - 1, Rest[s]] $)
+
+Show[10, From[1]]
+Show[10, Map[Square, From[1]]] where Square[n] = n n
+Show[10, Keep[Odd, From[1]]] where Odd[n] = Rem[n, 2] = 1
+Show[25, Sieve[From[2]]]

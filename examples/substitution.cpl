@@ -1,0 +1,30 @@
+|| Call by substitution, the ALGOL call by name. It is in "The Main
+|| Features of CPL" (1963) and the compilers had to implement it by
+|| passing "a parameterless function to evaluate the argument expression"
+|| (Richards); by mid 1966 it had been removed from the language.
+
+|| Jensen's device: the term is evaluated afresh for each value of i.
+let Sum[ref i, val a, b, subst t] = value of
+   $( let s = 0
+      for k = step a, 1, b do
+         $( i := k
+            s := s + t $)
+      result is s $)
+
+let i = 0
+Write['sum of i i for i = 1..10  = ', Sum[i, 1, 10, i i], '*n']
+Write['sum of 1/i for i = 1..100 = ', Sum[i, 1, 100, 1/i], '*n']
+
+|| Definition by substitution: w is the expression, not its value.
+let x, y = 1, 2
+let w == x x + 2x y + y y
+Write['w = ', w, '*n']
+x := 10
+Write['w = ', w, '*n']
+
+|| A substituted expression that has an L-value can be assigned to.
+let v = Newarray[real, (1, 3)]
+let j = 1
+let e == v[j]
+for n = 1 to 3 do $( j := n; e := 10n $)
+Write['v = ', v[1], ' ', v[2], ' ', v[3], '*n']

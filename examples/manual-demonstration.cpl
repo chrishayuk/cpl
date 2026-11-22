@@ -1,0 +1,9 @@
+|| The "simple example of a CPL job" that closes the supplement for the
+|| pre-pilot system, bound in with the Elementary Programming Manual.
+|| The job was preceded by the heading CPL, a title (XYZ123/TEST)
+|| and ***U, and followed by ***Z. The output routines were spelt in
+|| capitals.
+
+WRITE['*nDEMONSTRATION PROGRAM*n']
+$( let x = 1
+   WRITE[2x, '*tEnd of test*n'] $)

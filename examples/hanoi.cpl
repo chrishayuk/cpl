@@ -1,0 +1,14 @@
+|| The Towers of Hanoi, with a recursive routine.
+
+prefer integer
+let Moves = 0
+
+let rec routine Hanoi[n, string a, b, c] be
+   $( if n = 0 return
+      Hanoi[n - 1, a, c, b]
+      Moves := Moves + 1
+      Write['move disc ', n, ' from ', a, ' to ', b, '*n']
+      Hanoi[n - 1, c, b, a] $)
+
+Hanoi[3, 'left', 'right', 'middle']
+Write[Moves, ' moves*n']

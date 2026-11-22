@@ -1,0 +1,35 @@
+|| LH functions (Reference Manual 10.3.5): the programmer defines a new
+|| kind of L-value as a load function and an update routine. 'rhs' is the
+|| value being assigned.
+
+|| A temperature kept in Celsius, seen in Fahrenheit.
+let c = 100
+let function Fahrenheit[] be
+       load $( result is 9c/5 + 32 $)
+       update $( c := 5(rhs - 32)/9 $)
+
+Write[c, ' C is ', Fahrenheit[], ' F*n']
+Fahrenheit[] := 32
+Write['after Fahrenheit[] := 32, c = ', c, '*n']
+
+|| The L-value can be named, and passed by reference, like any other.
+let f ~~ Fahrenheit[]
+f := f + 18
+Write['after f := f + 18,        c = ', c, '*n']
+
+let rt Double[ref x] be $( x := 2x $)
+Double[Fahrenheit[]]
+Write['after Double[Fahrenheit[]], c = ', c, '*n']
+
+|| A symmetric matrix that stores only its lower triangle. 'fix' decides
+|| at the time of the call which element is meant.
+let t = Newarray[real, (1, 10)]
+for k = 1 to 10 do t[k] := 0
+let function Sym[index i, j] be
+    $( fix k = (i >= j -> i(i - 1)/2 + j, j(j - 1)/2 + i)
+       load $( result is t[k] $)
+       update $( t[k] := rhs $) $)
+
+Sym[1, 3] := 7
+Sym[4, 2] := 5
+Write['Sym[3, 1] = ', Sym[3, 1], '   Sym[2, 4] = ', Sym[2, 4], '*n']

@@ -1,0 +1,44 @@
+|| L-values and R-values. Definition by value (=) makes a new location;
+|| definition by reference (~~, printed as an equals sign under a tilde)
+|| names an existing one. From the 1966 revision of sections 19 and 23 of
+|| the Elementary Programming Manual.
+
+$( let a = 1
+   let b ~~ a
+   let c = a
+   b := 2
+   Write['a, b, c = ', a, ', ', b, ', ', c, '*n'] $)      || 2, 2, 1
+
+|| "With subscripted variables, the subscript is evaluated in both cases
+|| and fixed."
+$( let v = Newarray[real, (1, 5)]
+   let i = 3
+   v[3], v[4] := 10, 40
+   let a = v[i]
+   and b ~~ v[i]
+   i := 4
+   v[3] := v[3] + 1
+   Write['a, b = ', a, ', ', b, '*n'] $)                   || 10, 11
+
+|| The same two modes for parameters: called by value, called by reference.
+let rt Byvalue[x] be $( x := 1 $)
+let rt Byref[ref x] be $( x := 1 $)
+let a = 3
+Byvalue[a]
+Write['after Byvalue[a]  a = ', a, '*n']
+Byref[a]
+Write['after Byref[a]    a = ', a, '*n']
+
+|| A conditional expression has an L-value: its natural mode is L-mode.
+let p, q = 10, 20
+(a = 1 -> p, q) := 99
+Write['p, q = ', p, ', ', q, '*n']
+
+|| So has a 'reference of' block.
+reference of $( result is q $) := 77
+Write['q = ', q, '*n']
+
+|| An expression with no L-value gets a new, constant one.
+let k ~~ a + 1
+Write['k = ', k, '*n']
+k := 0                                                     || an error

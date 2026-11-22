@@ -1,0 +1,29 @@
+|| An LH function makes a new kind of variable. This one looks like a
+|| vector with a million elements, but keeps only those that have been
+|| given a value, in a list of pairs. 'load' says what the value of
+|| Sparse[i] is; 'update' says what Sparse[i] := x does.
+
+prefer general
+let Cells = NIL
+
+let rec Find[index i, general l] = Null[l] -> NIL,
+                           Hd[Hd[l]] = i -> Hd[l],
+                           Find[i, Tl[l]]
+
+let function Sparse[index i] be
+       load $( let p = Find[i, Cells]
+               result is (Null[p] -> 0, Hd[Tl[p]]) $)
+       update $( let p = Find[i, Cells]
+                 test Null[p] then Cells := Cons[List[i, rhs], Cells]
+                              or Hd[Tl[p]] := rhs $)
+
+Sparse[7] := 49
+Sparse[1000000] := 1
+Sparse[7] := Sparse[7] + 1
+Write['Sparse[7] = ', Sparse[7], '   Sparse[8] = ', Sparse[8], '   Sparse[1000000] = ', Sparse[1000000], '*n']
+Write['what is kept: ', Cells, '*n']
+
+|| It is an L-value like any other: it can be passed by reference.
+let rt Clear[ref x] be x := 0
+Clear[Sparse[1000000]]
+Write['what is kept: ', Cells, '*n']

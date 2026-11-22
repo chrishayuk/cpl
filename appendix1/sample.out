@@ -1,0 +1,2 @@
+letørecøN̸HCFø[øintegerøN̸nø,øN̸mø]ø=ø(øN̸mø>øN̸nø→øN̸HCFø[øN̸mø,øN̸nø]øcommaøN̸mø=øK̸0ø→øN̸nøcommaøN̸HCFø[øN̸mø,øN̸Remø[øN̸nø,øN̸mø]ø]ø)øletøN̸aø,øN̸bø=øK̸1071ø,øK̸462ø; øiføN̸aø<øN̸bødo øgotoøN̸Swapø; øN̸Nextø:øN̸Writeø[øS̸The answer is ø,øN̸HCFø[øN̸aø,øN̸bø]ø,øS̸
+ø]ø; ø§øforøN̸iø=øK̸1ø,øK̸2ødot stringøK̸5ødoø§øN̸aø:=ønegøN̸aø+øK̸.5ø; øunlessøN̸aø>øK̸0ødo øbreakø§̸ø§̸ø; øvalofø§øresultisøN̸aø§̸ø; øfinishø; øN̸Swapø:øN̸aø,øN̸bø:=øN̸bø,øN̸aø; øgotoøN̸Nextø

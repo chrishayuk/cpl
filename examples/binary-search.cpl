@@ -1,0 +1,17 @@
+|| Binary search in a sorted vector. The function has two results: whether
+|| the key was found, and where it is or ought to be.
+
+let Search[vector v, index k] = value of
+   $( let l, r = Bounds[v]
+      while l <= r do
+         $( let m = Quot[l + r, 2]
+            if v[m] = k result is true, m
+            test v[m] < k then l := m + 1 or r := m - 1 $)
+      result is false, l $)
+
+let v = Formarray[index, (1, 12)][2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+
+for k = 13, 2, 37, 20, 1, 40 do
+   $( let f, p = Search[v, k]
+      test f then Write[k, ' is at ', p, '*n']
+           or Write[k, ' is missing; it belongs at ', p, '*n'] $)

@@ -1,0 +1,10 @@
+p            T  T  F  F
+q            T  F  T  F
+
+p /\ q    :  T  F  F  F
+p \/ q    :  T  T  T  F
+p == q    :  T  F  F  T
+p ~== q   :  F  T  T  F
+~p \/ q   :  T  F  T  T
+
+~(p /\ q) == (~p \/ ~q) always: true

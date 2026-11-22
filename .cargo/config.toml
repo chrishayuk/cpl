@@ -1,0 +1,6 @@
+# `cargo test --target wasm32-wasip1` (or `cargo run --target wasm32-wasip1`)
+# runs under wasmtime, with access to the package directory only.
+[target.wasm32-wasip1]
+runner = "wasmtime run --dir=."
+# CPL recursion is carried on the stack; the default is 1 MB.
+rustflags = ["-C", "link-arg=-zstack-size=8388608"]

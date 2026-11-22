@@ -1,0 +1,14 @@
+|| A multiplication table. Printd[x, i, j] is one of the output routines
+|| of the first CPL system: i figures before the point and j after, with
+|| spaces for the zeros that do not count.
+
+Write['   |']
+for j = 1 to 9 do Printd[j, 3, 0]
+Write['*n---+']
+for j = 1 to 9 do Write['----']
+Write['*n']
+for i = 1 to 9 do
+   $( Printd[i, 1, 0]
+      Write[' |']
+      for j = 1 to 9 do Printd[i j, 3, 0]
+      Write['*n'] $)

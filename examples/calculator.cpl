@@ -1,0 +1,70 @@
+|| A calculator: expressions are read from the input, a line at a time,
+|| and worked out by recursive descent. Three mutually recursive
+|| functions, one for each level of the grammar
+||     expression = term { + term | - term }
+||     term       = factor { * factor | / factor }
+||     factor     = number | ( expression ) | - factor
+|| and a label to jump to, from however deep, when the line is wrong.
+
+let s = ''            || the line
+let p = 1             || the place reached in it
+
+let Peek[] == value of
+   $( while p <= Length[s] /\ Character[p, s] = ' ' do p := p + 1
+      result is (p > Length[s] -> '', Character[p, s]) $)
+
+let Digit[string c] = '0' <= c <= '9'
+
+let Number[label Bad] == value of
+   $( let n, Places = 0, 0
+      unless Digit[Peek[]] go to Bad
+      while p <= Length[s] /\ (Digit[Character[p, s]] \/ Character[p, s] = '.') do
+         $( let c = Character[p, s]
+            test c = '.' then Places := 1
+            or $( n := 10n + Index[c] - 48
+                  if Places > 0 do Places := 10 Places $)
+            p := p + 1 $)
+      result is (Places > 0 -> n/Places, n) $)
+
+let rec Expression[label Bad] == value of
+        $( let v = Term[Bad]
+           $( let c = Peek[]
+              unless c = '+' \/ c = '-' result is v
+              p := p + 1
+              v := c = '+' -> v + Term[Bad], v - Term[Bad] $) repeat $)
+    and Term[label Bad] == value of
+        $( let v = Factor[Bad]
+           $( let c = Peek[]
+              unless c = '**' \/ c = '/' result is v
+              p := p + 1
+              v := c = '**' -> v Factor[Bad], v/Factor[Bad] $) repeat $)
+    and Factor[label Bad] == value of
+        $( let c = Peek[]
+           if c = '-' do $( p := p + 1; result is -Factor[Bad] $)
+           unless c = '(' result is Number[Bad]
+           p := p + 1
+           let v = Expression[Bad]
+           unless Peek[] = ')' go to Bad
+           p := p + 1
+           result is v $)
+
+|| Read a line; the empty string with End set means the input is finished.
+let End = false
+let Line[] == value of
+   $( let l, c = '', ''
+      $( Readchar[c]
+         if c = '' do End := true
+         if c = '' \/ c = '*n' result is l
+         l := l <=> c $) repeat $)
+
+$( s, p := Line[], 1
+   if End /\ s = '' break
+   unless s = '' do
+      $( let v = Expression[Wrong]
+         unless Peek[] = '' go to Wrong
+         Write[s, ' = ', v, '*n']
+         go to Done
+  Wrong: Write[s, '*n']
+         Space[p - 1]
+         Write['^ this is not an expression*n']
+  Done: $) $) repeat

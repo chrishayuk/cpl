@@ -1,0 +1,8 @@
+|| A table of temperatures. Arithmetic is real unless something says
+|| otherwise; Printd sets the columns out.
+
+Write['   F       C*n']
+for f = step 0, 20, 220 do
+   $( Printd[f, 3, 0]
+      Printd[(f - 32) 5/9, 4, 1]
+      Write['*n'] $)

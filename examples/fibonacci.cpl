@@ -1,0 +1,18 @@
+|| The Fibonacci numbers three ways: by simultaneous assignment, by the
+|| obvious recursion, and by a recursion that carries the pair along.
+
+prefer integer
+
+Write['by assignment: ']
+$( let a, b = 0, 1
+   for i = 1 to 15 do
+      $( Write[a, ' ']
+         a, b := b, a + b $) $)
+Write['*n']
+
+let rec Fib[n] = n < 2 -> n, Fib[n - 1] + Fib[n - 2]
+Write['Fib[20] = ', Fib[20], '*n']
+
+|| The simultaneous assignment again, as a function of three parameters.
+let rec Pair[n, a, b] = n = 0 -> a, Pair[n - 1, b, a + b]
+Write['the 90th is ', Pair[90, 0, 1], '*n']

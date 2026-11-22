@@ -1,0 +1,13 @@
+|| Pascal's triangle from one vector, updated from right to left so that
+|| each element is still last line's when it is needed.
+
+let n = 10
+let r = Newarray[integer, (0, n + 1)]
+for i = 0 to n + 1 do r[i] := 0
+r[0] := 1
+
+for i = 0 to n do
+   $( Space[2(n - i)]
+      for j = 0 to i do Printd[r[j], 3, 0]
+      Write['*n']
+      for j = step i + 1, -1, 1 do r[j] := r[j] + r[j - 1] $)

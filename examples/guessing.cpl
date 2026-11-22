@@ -1,0 +1,20 @@
+|| The computer guesses your number by bisection. Think of a number from
+|| 1 to 100, and answer each guess with -1 (too small), 1 (too big) or
+|| 0 (right). The answers supplied with this program are for 35.
+
+prefer integer
+let l, h, t = 1, 100, 0
+
+$( let g = Quot[l + h, 2]
+   let a = 0
+   t := t + 1
+   Write['Is it ', g, '? ']
+   Read[a]
+   Write[(a = 0 -> 'right', a < 0 -> 'too small', 'too big'), '*n']
+   if a = 0 break
+   test a < 0 then l := g + 1 or h := g - 1
+   if l > h do
+      $( Write['You have changed your mind.*n']
+         finish $) $) repeat
+
+Write['Got it in ', t, ' guesses.*n']

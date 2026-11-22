@@ -1,0 +1,11 @@
+|| A diamond of stars. Mod is the modulus (the absolute value), and a
+|| routine with two parameters does the repeating.
+
+let rt Repeat[index n, string s] be
+   for k = step 1, 1, n do Write[s]
+
+let n = 6
+for i = step 1 - n, 1, n - 1 do
+   $( Repeat[Mod[i], ' ']
+      Repeat[2(n - Mod[i]) - 1, '**']
+      Write['*n'] $)

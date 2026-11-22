@@ -1,0 +1,6 @@
+a = 1   b = two   c = (3, 4)
+x = 3   y = 4
+47 = 9 times 5 plus 2
+x = 4   y = 3
+Sum3[1, Divide[47, 5]] = 12.0
+! line 34: a list of 3 member(s) is matched against 2 name(s) (in main program)

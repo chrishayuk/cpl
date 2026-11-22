@@ -1,0 +1,29 @@
+|| The digits of pi by the spigot of Rabinowitz and Wagon: integer
+|| arithmetic only, on a vector of remainders.
+
+prefer integer
+let n = 40                                || digits wanted
+let Len = Quot[10n, 3] + 1
+let a = Newarray[integer, (0, Len)]
+for i = 0 to Len do a[i] := 2
+
+let Nines, Held = 0, -1
+
+let rt Out[d] be
+   $( if Held >= 0 do Write[Held]
+      for k = step 1, 1, Nines do Write[d = 10 -> 0, 9]
+      Held, Nines := (d = 10 -> 0, d), 0 $)
+
+for j = 1 to n + 1 do
+   $( let q = 0
+      for i = step Len, -1, 1 do
+         $( let x = 10 a[i] + q i
+            a[i] := Rem[x, 2i - 1]
+            q := Quot[x, 2i - 1] $)
+      let d = Quot[q, 10]
+      a[1] := Rem[q, 10]
+      test d = 9 then Nines := Nines + 1
+      or test d = 10 then $( Held := Held + 1; Out[10] $)
+      or Out[d]
+      if j = 2 do Write['.'] $)
+Write['*n']

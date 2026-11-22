@@ -1,0 +1,11 @@
+p              = #o2736   which is 1502
+#b010111011110 = #o2736
+Lshift[p, 3]   = #o27360
+Rshift[p, 3]   = #o273   and Lshift[p, -3] = #o273
+Rotate[p, 20]  = #o70000135
+Ones[3, 0]     = #o17   Ones[0, 3] = #o17
+Field[p, 6, 10] = #o27   Bit[p, 1] = #o1
+c /\ #o77      = #o55
+merged         = #o5235
+ones in p      = 8
+p in binary    = 10111011110

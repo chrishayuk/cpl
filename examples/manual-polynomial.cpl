@@ -1,0 +1,17 @@
+|| Section 22 of the Elementary Programming Manual: a result expression.
+|| "Suppose we wish to define the function f(x) = the sum of a[n] x**n for
+|| n from 0 to 10. Let us suppose that the coefficients are available as
+|| an array A with subscripts running from 0 to 10."
+||
+|| "value of" turns the block into an expression; "result is" ends it.
+
+let A = Formarray[real, (0, 10)][1, 1, 1/2, 1/6, 1/24, 1/120, 1/720, 1/5040, 1/40320, 1/362880, 1/3628800]
+
+let f[x] = value of $( let Sum = 0
+                       for i = step 10, -1, 0 do
+                          Sum := x Sum + A[i]
+                       result is Sum $)
+
+|| The coefficients are 1/n!, so f is the start of the series for Exp.
+for x = 0, 0.5, 1, 2 do
+   Write['f[', x, '] = ', f[x], '    Exp = ', Exp[x], '*n']

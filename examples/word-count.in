@@ -1,0 +1,4 @@
+CPL is based on, and contains the concepts of, ALGOL 60.
+In addition there are extended data descriptions, command and
+expression structures, provision for manipulating non-numerical
+objects, and comprehensive input-output facilities.

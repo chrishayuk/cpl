@@ -1,0 +1,24 @@
+|| In how many ways can a sum be paid in the coins of 1966? The pound
+|| had twenty shillings of twelve pence; the coins were the halfcrown
+|| (30d), florin (24d), shilling (12d), sixpence, threepence and penny.
+
+prefer integer
+let Coin = Formarray[integer, (1, 6)][1, 3, 6, 12, 24, 30]
+
+|| Ways of paying a pence with the first k kinds of coin: either without
+|| the k-th kind, or with at least one of it.
+let rec Ways[a, k] = a = 0 -> 1,
+                     a < 0 \/ k = 0 -> 0,
+                     Ways[a, k - 1] + Ways[a - Coin[k], k]
+
+for a = 1, 3, 6, 12, 30, 60 do
+   Write[a, 'd can be paid in ', Ways[a, 6], ' ways*n']
+
+|| The same by tabulation, which is quick enough for a pound.
+let n = 240
+let w = Newarray[integer, (0, n)]
+for a = 1 to n do w[a] := 0
+w[0] := 1
+for k = 1 to 6 do
+   for a = step Coin[k], 1, n do w[a] := w[a] + w[a - Coin[k]]
+Write['a pound can be paid in ', w[n], ' ways*n']

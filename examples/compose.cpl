@@ -1,0 +1,24 @@
+|| Programming with functions: composition, repeated application, and
+|| functions made by supplying one argument and waiting for the other.
+
+prefer general
+
+let Compose[f, g] = h where h[x] = f[g[x]]
+let Identity[x] = x
+let rec Power[f, n] = n = 0 -> Identity, Compose[f, Power[f, n - 1]]
+
+let Add[a] = f where f[b] = a + b
+let Times[a] = f where f[b] = a b
+
+let Double, Succ = Times[2], Add[1]
+
+Write['Double[21]                   = ', Double[21], '*n']
+Write['Compose[Double, Succ][4]     = ', Compose[Double, Succ][4], '*n']
+Write['Compose[Succ, Double][4]     = ', Compose[Succ, Double][4], '*n']
+Write['Power[Double, 10][1]         = ', Power[Double, 10][1], '*n']
+Write['Power[Sqrt, 3][256]          = ', Power[Sqrt, 3][256], '*n']
+
+|| A numerical derivative is a function from functions to functions.
+let Deriv[f] = d where d[x] = (f[x + h] - f[x - h])/(2h) where h = 1@-5
+Write['Deriv[Sin][0]                = ', Deriv[Sin][0], '*n']
+Write['Deriv[Deriv[Cube]][2]        = ', (Deriv[Deriv[Cube]][2] where Cube[x] = x x x), '*n']

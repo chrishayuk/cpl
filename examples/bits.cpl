@@ -1,0 +1,35 @@
+|| Logical variables: strings of 24 bits (48 for long logical), "the
+|| means whereby most non-numerical work is carried out in CPL". The
+|| functions are those of section 25 of the Elementary Programming
+|| Manual; bits are numbered from 0 at the right hand end.
+
+let p = #o2736
+Write['p              = ', p, '   which is ', Index[p], '*n']
+Write['#b010111011110 = ', #b010111011110, '*n']
+Write['Lshift[p, 3]   = ', Lshift[p, 3], '*n']
+Write['Rshift[p, 3]   = ', Rshift[p, 3], '   and Lshift[p, -3] = ', Lshift[p, -3], '*n']
+Write['Rotate[p, 20]  = ', Rotate[p, 20], '*n']
+Write['Ones[3, 0]     = ', Ones[3, 0], '   Ones[0, 3] = ', Ones[0, 3], '*n']
+Write['Field[p, 6, 10] = ', Field[p, 6, 10], '   Bit[p, 1] = ', Bit[p, 1], '*n']
+
+|| The Boolean operators work on every bit independently. The manual's
+|| two examples: mask off all but the bottom six bits, and replace the
+|| field of c picked out by the ones of b with the same field of a.
+let a, b, c = #o1234, #o0770, #o5555
+Write['c /\ #o77      = ', c /\ #o77, '*n']
+c := (c /\ ~b) \/ (b /\ a)
+Write['merged         = ', c, '*n']
+
+|| Counting the ones in a word.
+let Count[logical w] = value of
+   $( let n be index
+      n := 0
+      until w = #o0 do
+         $( n := n + Index[Bit[w, 0]]
+            w := Rshift[w, 1] $)
+      result is n $)
+Write['ones in p      = ', Count[p], '*n']
+
+|| In binary, a digit at a time.
+let rec Binary[logical w] = w = #o0 -> '', Binary[Rshift[w, 1]] <=> String[48 + Index[Bit[w, 0]]]
+Write['p in binary    = ', Binary[p], '*n']

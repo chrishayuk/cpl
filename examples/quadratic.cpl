@@ -1,0 +1,18 @@
+|| The roots of a quadratic, real or complex. CPL has complex numbers as
+|| a type of the language: the conditional below has one real arm and one
+|| complex arm, so the function gives complex results, and the arithmetic
+|| on them is the ordinary + - * / chosen by the types of the operands.
+
+let Roots[real a, b, c] = value of
+   $( let d = b b - 4a c
+      let r = d >= 0 -> Sqrt[d], Cpx[0, Sqrt[-d]]
+      result is (-b + r)/(2a), (-b - r)/(2a) $)
+
+let rt Solve[real a, b, c] be
+   $( let p, q = Roots[a, b, c]
+      Write[a, 'xx + ', b, 'x + ', c, ' = 0   x = ', p, ' or ', q, '*n']
+      Write['      check: ', a p p + b p + c, ' and ', a q q + b q + c, '*n'] $)
+
+Solve[1, -3, 2]
+Solve[1, 2, 5]
+Solve[1, 0, 1]

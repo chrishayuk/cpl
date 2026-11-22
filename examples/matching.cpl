@@ -1,0 +1,34 @@
+|| Explicit lists of names matched against a list of values.
+||
+|| "If an explicit list is written on the left-hand side then the
+|| right-hand side is either an explicit list, or a list expression; in
+|| the latter case the transfer function Members is automatically
+|| invoked" (The Main Features of CPL, 1963, section 24).
+
+let l = List[1, 'two', List[3, 4]]
+
+|| in an assignment ...
+let a, b, c be general, general, general
+a, b, c := l
+Write['a = ', a, '   b = ', b, '   c = ', c, '*n']
+
+|| ... in a definition ...
+let x, y = c
+Write['x = ', x, '   y = ', y, '*n']
+
+|| ... and for a function with several results (Reference Manual 4.5).
+let Divide[integer n, d] = Quot[n, d], Rem[n, d]
+let q, r = Divide[47, 5]
+Write['47 = ', q, ' times 5 plus ', r, '*n']
+
+|| Simultaneous assignment evaluates every right hand side first.
+x, y := y, x
+Write['x = ', x, '   y = ', y, '*n']
+
+|| Such results pass straight into an argument list, where "bracketing
+|| has no significance".
+let Sum3[p, q, r] = p + q + r
+Write['Sum3[1, Divide[47, 5]] = ', Sum3[1, Divide[47, 5]], '*n']
+
+|| The lengths must agree.
+a, b := l

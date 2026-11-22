@@ -1,0 +1,21 @@
+|| 52 factorial, the number of ways of shuffling a pack of cards, is too
+|| long for any integer of the language. Here it is held as a vector of
+|| decimal digits and multiplied the way one would by hand.
+
+prefer integer
+let d = Newarray[index, (1, 80)]
+let Len = 1
+d[1] := 1
+
+for n = 2 to 52 do
+   $( let Carry = 0
+      for i = 1 to Len do
+         $( let x = n d[i] + Carry
+            d[i], Carry := Rem[x, 10], Quot[x, 10] $)
+      until Carry = 0 do
+         $( Len := Len + 1
+            d[Len], Carry := Rem[Carry, 10], Quot[Carry, 10] $) $)
+
+Write['52! = ']
+for i = step Len, -1, 1 do Write[d[i]]
+Write['*n', Len, ' digits*n']

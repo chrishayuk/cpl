@@ -1,0 +1,18 @@
+[package]
+name = "cpl"
+version = "0.1.0"
+edition = "2021"
+description = "CPL (Combined Programming Language, Cambridge and London 1962-66): the ancestor of BCPL, B and C, implemented from the 1966 Working Papers"
+
+[lib]
+name = "cpl"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cpl"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,17 @@
+|| Integration by Simpson's rule. The function to be integrated is a
+|| parameter, and three of the actual parameters are functions written
+|| on the spot with where.
+
+let Simpson[function f, real a, b, index n] = value of
+   $( let h = (b - a)/n
+      let s = f[a] + f[b]
+      for i = step 1, 1, n - 1 do
+         s := s + (Rem[i, 2] = 1 -> 4, 2) f[a + i h]
+      result is s h/3 $)
+
+let Pi = 4 Arctan[1]
+
+Write['Sin from 0 to pi         ', Simpson[Sin, 0, Pi, 100], '*n']
+Write['1/x from 1 to e          ', (Simpson[Recip, 1, Exp[1], 100] where Recip[x] = 1/x), '*n']
+Write['4/(1 + xx) from 0 to 1   ', (Simpson[Witch, 0, 1, 100] where Witch[x] = 4/(1 + x x)), '*n']
+Write['xxx from 0 to 2, n = 2   ', (Simpson[Cube, 0, 2, 2] where Cube[x] = x x x), '*n']

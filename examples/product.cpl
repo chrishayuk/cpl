@@ -1,0 +1,19 @@
+|| Strachey's Cartesian product of a list of lists. The definition is
+|| his, as published: three nested where-clauses, each defining the
+|| function handed to the list iterator of the line above.
+||
+|| Lit is Strachey's iterator: Lit[f, z, L] applies f to each member of L
+|| and the result so far, from the right, starting from z.
+
+prefer general
+
+let rec Lit[f, z, l] = Null[l] -> z, f[Hd[l], Lit[f, z, Tl[l]]]
+
+let Product[L] = Lit[f, List1[NIL], L]
+    where f[k, z] = Lit[g, NIL, k]
+          where g[x, y] = Lit[h, y, z]
+                where h[p, q] = Cons[Cons[x, p], q]
+
+Write[Product[List[List[1, 2], List['a', 'b', 'c']]], '*n']
+Write[Product[List[List[0, 1], List[0, 1], List[0, 1]]], '*n']
+Write[Product[NIL], '*n']

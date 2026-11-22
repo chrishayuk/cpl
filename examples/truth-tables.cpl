@@ -1,0 +1,24 @@
+|| Truth tables. A Boolean function of two variables is passed as a
+|| parameter; the operators are those of section 9 of the Elementary
+|| Programming Manual, with == for "if and only if" and ~== for
+|| "exclusive or".
+
+let rt Table[string t, function f] be
+   $( Write[t, ':']
+      for p = true, false do
+         for q = true, false do Write['  ', (f[p, q] -> 'T', 'F')]
+      Write['*n'] $)
+
+Write['p            T  T  F  F*nq            T  F  T  F*n*n']
+Table['p /\ q    ', And]      where And[Boolean p, q] = p /\ q
+Table['p \/ q    ', Or]       where Or[Boolean p, q] = p \/ q
+Table['p == q    ', Equiv]    where Equiv[Boolean p, q] = p == q
+Table['p ~== q   ', Differ]   where Differ[Boolean p, q] = p ~== q
+Table['~p \/ q   ', Implies]  where Implies[Boolean p, q] = ~p \/ q
+
+|| De Morgan's law, checked for every case.
+let Law = true
+for p = true, false do
+   for q = true, false do
+      Law := Law /\ (~(p /\ q) == (~p \/ ~q))
+Write['*n~(p /\ q) == (~p \/ ~q) always: ', Law, '*n']

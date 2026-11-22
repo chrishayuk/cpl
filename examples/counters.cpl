@@ -1,0 +1,27 @@
+|| Functions that remember. A function is a data item made of code and a
+|| free variable list, so a function that returns a function gives each
+|| one its own variables: here each counter owns an n of its own.
+||
+|| Next is defined with == and so is a free function: its free variable
+|| n is the variable itself. Defined with = it would be a fixed function,
+|| which takes a copy of n when it is defined and may not assign to it.
+
+prefer integer
+
+let Counter[Start] = value of
+   $( let n = Start
+      let Next[] == value of $( n := n + 1; result is n $)
+      result is Next $)
+
+let a, b = Counter[0], Counter[100]
+Write[a[], ' ', a[], ' ', a[], '   ', b[], ' ', b[], '   ', a[], '*n']
+
+|| An accumulator: give it a number, and it tells you the total so far.
+let Accumulator[] = value of
+   $( let t = 0
+      let Add[x] == value of $( t := t + x; result is t $)
+      result is Add $)
+
+let Total = Accumulator[]
+for i = 1 to 10 do Total[i]
+Write['1 + 2 + ... + 10 = ', Total[0], '*n']

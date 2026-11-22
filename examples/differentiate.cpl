@@ -1,0 +1,47 @@
+|| Symbolic differentiation, the classic LISP exercise, with the lists of
+|| the 1963 paper. An expression is a number, a name (a string), or a
+|| list of an operator and two operands: 3xx + 2 is
+||    ('+', ('*', 3, ('*', 'x', 'x')), 2)
+|| Type[e] tells the three apart: this is what the type general is for.
+
+prefer general
+
+let Op[e] = Hd[e]
+and Left[e] = Hd[Tl[e]]
+and Right[e] = Hd[Tl[Tl[e]]]
+let Number[e] = Type[e] ~= string /\ Atom[e]
+
+|| Building sums and products, tidying as they are built.
+let Sum[a, b] = Number[a] /\ Number[b] -> a + b,
+                a = 0 -> b,
+                b = 0 -> a,
+                List['+', a, b]
+let Product[a, b] = Number[a] /\ Number[b] -> a b,
+                    a = 0 \/ b = 0 -> 0,
+                    a = 1 -> b,
+                    b = 1 -> a,
+                    List['**', a, b]
+
+let rec D[e, string v] = Number[e] -> 0,
+                         Atom[e] -> (e = v -> 1, 0),
+                         Op[e] = '+' -> Sum[D[Left[e], v], D[Right[e], v]],
+                         Sum[Product[Left[e], D[Right[e], v]], Product[D[Left[e], v], Right[e]]]
+
+|| Back to the usual notation.
+let rec Digits[n] = n < 10 -> String[48 + n], Digits[Quot[n, 10]] <=> String[48 + Rem[n, 10]]
+let rec Show[e] = Type[e] = string -> e,
+                  Atom[e] -> Digits[e],
+                  '(' <=> Show[Left[e]] <=> ' ' <=> Op[e] <=> ' ' <=> Show[Right[e]] <=> ')'
+
+let rec Value[e, x] = Number[e] -> e,
+                      Atom[e] -> x,
+                      Op[e] = '+' -> Value[Left[e], x] + Value[Right[e], x],
+                      Value[Left[e], x] Value[Right[e], x]
+
+let e = List['+', List['**', 3, List['**', 'x', 'x']], List['+', List['**', 2, 'x'], 7]]
+let d = D[e, 'x']
+
+Write['e        = ', Show[e], '*n']
+Write['de/dx    = ', Show[d], '*n']
+Write['d2e/dx2  = ', Show[D[d, 'x']], '*n']
+Write['at x = 5:  e = ', Value[e, 5], '   de/dx = ', Value[d, 5], '*n']

@@ -1,0 +1,11 @@
+|| Ten green bottles, with a function for the words that change.
+
+let Bottles[index n] = (n = 0 -> 'No more', Word[n]) <=> ' green bottle' <=> (n = 1 -> '', 's')
+    where Word[index n] = Formarray[string, (1, 10)]['One', 'Two', 'Three', 'Four', 'Five',
+                                                     'Six', 'Seven', 'Eight', 'Nine', 'Ten'][n]
+
+for n = step 10, -1, 8 do
+   $( for k = 1 to 2 do Write[Bottles[n], ' hanging on the wall,*n']
+      Write['And if one green bottle should accidentally fall,*n']
+      Write['There*'ll be ', Bottles[n - 1], ' hanging on the wall.*n*n'] $)
+Write['...*n']

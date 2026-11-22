@@ -1,0 +1,9 @@
+|| FizzBuzz, with a conditional expression of mixed type. The arms are a
+|| string, a string, a string and a number, so the expression is general
+|| and each value carries its own type to Write.
+
+for i = 1 to 30 do
+   Write[(Rem[i, 15] = 0 -> 'FizzBuzz',
+          Rem[i, 5] = 0 -> 'Buzz',
+          Rem[i, 3] = 0 -> 'Fizz',
+          i), '*n']

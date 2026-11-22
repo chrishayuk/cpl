@@ -1,0 +1,46 @@
+|| Labels are data items (Reference Manual 9.3): they can be assigned,
+|| passed as parameters, and jumped to from inside other activations.
+
+|| The example of 9.3.2. "Each call of R ultimately has its two label
+|| parameters specifying the same point N in two different activations
+|| of R", and the jump works its way back out through every second one:
+|| "the effect of executing R[10, Even, Odd] is to jump to the
+|| destination Even, whereas R[9, Even, Odd] jumps to Odd."
+let rec routine R[integer n, label L, M] be
+   $( if n > 0 do R[n - 1, M, N]
+   N: goto L $)
+
+let Try[integer n] = value of
+   $(    R[n, Even, Odd]
+   Even: result is 'Even'
+   Odd:  result is 'Odd' $)
+
+Write['R[10, Even, Odd] jumps to ', Try[10], '*n']
+Write['R[9, Even, Odd] jumps to ', Try[9], '*n']
+
+|| A label variable used as a switch (Main Features, section 13).
+let x = -5
+let s be label
+s := x < 0 -> Neg, Pos
+goto s
+Pos: Write['x is not negative*n']
+     goto Next
+Neg: Write['x is negative*n']
+Next:
+
+|| A jump out of a routine, abandoning its activation: an error exit.
+let rt Search[vector v, integer n, real k, label f] be
+   $( for i = 1 to n do if v[i] = k goto f $)
+let v = Formarray[real, (1, 5)][3, 1, 4, 1, 5]
+Search[v, 5, 4, Found]
+Write['4 is absent*n']
+goto Done
+Found: Write['4 is present*n']
+Done:
+
+|| A jump into the middle of a cycle.
+let n = 0
+goto Middle
+$( Write['top of cycle, n = ', n, '*n']
+Middle:
+   n := n + 1 $) repeat until n >= 3

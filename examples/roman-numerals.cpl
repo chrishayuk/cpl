@@ -1,0 +1,15 @@
+|| Roman numerals, from two parallel arrays and the concatenating <=>.
+
+let v = Formarray[index, (1, 13)][1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+let s = Formarray[string, (1, 13)]['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I']
+
+let Roman[index n] = value of
+   $( let r = ''
+      for i = 1 to 13 do
+         while n >= v[i] do
+            $( r := r <=> s[i]
+               n := n - v[i] $)
+      result is r $)
+
+for n = 1, 4, 9, 14, 40, 90, 400, 1962, 1966, 1994, 2024, 3999 do
+   Write[n, ' = ', Roman[n], '*n']

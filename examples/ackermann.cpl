@@ -1,0 +1,10 @@
+|| Ackermann's function: three lines that defeat any attempt to compute
+|| them by loops alone.
+
+let rec A[integer m, n] = m = 0 -> n + 1,
+                          n = 0 -> A[m - 1, 1],
+                          A[m - 1, A[m, n - 1]]
+
+for m = 0 to 3 do
+   $( for n = 0 to 4 do Write[A[m, n], ' ']
+      Write['*n'] $)

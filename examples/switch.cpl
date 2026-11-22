@@ -1,0 +1,29 @@
+|| The switch-command "retro-fitted into CPL in 1966" (Richards); it is
+|| described on the last page of Appendix 1 of the Working Papers and
+|| used throughout the preprocessor program given there. Control passes
+|| to the matching case and carries on from there, as it still does in C.
+
+let Kind[string c] = value of
+   $( switch on c into
+      $( case 'a': case 'e': case 'i': case 'o': case 'u':
+            result is 'vowel'
+         case ' ':
+            result is 'space'
+         default:
+            result is 'consonant' $) $)
+
+let s = 'cpl to c'
+for i = step 1, 1, Length[s] do
+   $( let c = Character[i, s]
+      Write['*'', c, '*' ', Kind[c], '*n'] $)
+
+|| Falling through from one case to the next.
+for n = 1 to 4 do
+   $( Write[n, ':']
+      switch on n into
+      $( case 1: Write[' one']
+         case 2: Write[' two']
+                 goto Out
+         case 3: Write[' three']
+         default: Write[' many'] $)
+ Out: Write['*n'] $)

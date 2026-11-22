@@ -1,0 +1,35 @@
+|| Sorting lists: insertion sort and merge sort, each taking the ordering
+|| as a parameter, so the same functions sort numbers and strings.
+
+prefer general
+
+let rec Insert[Before, x, l] = Null[l] -> List1[x],
+                               Before[x, Hd[l]] -> Cons[x, l],
+                               Cons[Hd[l], Insert[Before, x, Tl[l]]]
+
+let rec Isort[Before, l] = Null[l] -> NIL, Insert[Before, Hd[l], Isort[Before, Tl[l]]]
+
+let rec Merge[Before, a, b] = Null[a] -> b,
+                              Null[b] -> a,
+                              Before[Hd[b], Hd[a]] -> Cons[Hd[b], Merge[Before, a, Tl[b]]],
+                              Cons[Hd[a], Merge[Before, Tl[a], b]]
+
+|| Every other member of a list, starting with the first.
+let rec Alternate[l] = Null[l] -> NIL,
+                       Null[Tl[l]] -> l,
+                       Cons[Hd[l], Alternate[Tl[Tl[l]]]]
+
+let rec Msort[Before, l] = Null[l] -> l,
+                           Null[Tl[l]] -> l,
+                           Merge[Before, Msort[Before, Alternate[l]], Msort[Before, Alternate[Tl[l]]]]
+
+let Less[a, b] = a < b
+let Greater[a, b] = a > b
+
+let n = List[31, 41, 59, 26, 53, 58, 97, 93, 23, 84, 62, 64]
+let w = List['strachey', 'barron', 'buxton', 'hartley', 'nixon', 'park', 'coulouris', 'richards']
+
+Write[n, '*n']
+Write[Isort[Less, n], '*n']
+Write[Msort[Greater, n], '*n']
+Write[Msort[Less, w], '*n']

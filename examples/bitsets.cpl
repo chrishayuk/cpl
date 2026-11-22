@@ -1,0 +1,27 @@
+|| Sets of small numbers as long logicals: 48 bits, one for each of the
+|| numbers 0 to 47. Union is \/, intersection /\, complement ~.
+
+let Set[index n] = Longones[n, n]
+let Has[long logical s, index n] = Bit[s, n] ~= LongLogical[0]
+
+let rt Show[string t, long logical s] be
+   $( Write[t, ' {']
+      for i = 0 to 47 do if Has[s, i] do Write[' ', i]
+      Write[' }*n'] $)
+
+let Evens, Threes, Primes = LongLogical[0], LongLogical[0], Longones[2, 47]
+for i = step 0, 2, 46 do Evens := Evens \/ Set[i]
+for i = step 0, 3, 45 do Threes := Threes \/ Set[i]
+
+|| The sieve again: strike out the multiples.
+for i = 2 to 6 do
+   if Has[Primes, i] do
+      $( let j = i i
+         while j <= 47 do
+            $( Primes := Primes /\ ~Set[j]
+               j := j + i $) $)
+
+Show['multiples of 6', Evens /\ Threes]
+Show['primes        ', Primes]
+Show['odd primes    ', Primes /\ ~Evens]
+Show['even primes   ', Primes /\ Evens]

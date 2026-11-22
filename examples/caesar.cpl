@@ -1,0 +1,18 @@
+|| A Caesar cipher. A character is a string of length one; Index gives
+|| its number and String turns a number back into a character.
+
+let Shift[string c, index k] = value of
+   $( let n = Index[c]
+      if 'a' <= c <= 'z' result is String[97 + Rem[n - 97 + k, 26]]
+      if 'A' <= c <= 'Z' result is String[65 + Rem[n - 65 + k, 26]]
+      result is c $)
+
+let Caesar[string s, index k] = value of
+   $( let r = ''
+      for i = step 1, 1, Length[s] do r := r <=> Shift[Character[i, s], k]
+      result is r $)
+
+let m = 'The Combined Programming Language'
+let c = Caesar[m, 3]
+Write[m, '*n', c, '*n', Caesar[c, 23], '*n']
+Write[Caesar['Uryyb, jbeyq!', 13], '*n']

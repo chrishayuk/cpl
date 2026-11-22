@@ -1,0 +1,27 @@
+|| The example functions of "The Main Features of CPL" (1963), section 29,
+|| written in the notation of the 1966 Reference Manual.
+
+|| Exp sums a power series. Note the simultaneous assignment.
+let Exp1[x] = value of
+   $( let s, t, r = 0, 1, 1
+      s, t, r := s + t, t x/r, r + 1 repeat until t << 1
+      result is s $)
+
+|| Fact1 is "a recursive function for computing a factorial" ...
+let rec Fact1[x] = (x = 0) -> 1, x Fact1[x - 1]
+
+|| ... "while Fact2 produces the same result in a more conventional and
+|| efficient manner."
+let Fact2[x] = value of
+   $( let f = 1
+      until x = 0 do f, x := x f, x - 1
+      result is f $)
+
+Write['Exp1[1]   = ', Exp1[1], '*n']
+Write['Exp[1]    = ', Exp[1], '*n']
+for n = 0 to 10 do Write[n, '! = ', Fact1[n], ' = ', Fact2[n], '*n']
+
+|| With no type written, a parameter takes the preferred type, real.
+|| An integer version must say so; index arithmetic is checked.
+let rec Fact3[integer n] = n = 0 -> 1, n Fact3[n - 1]
+Write['20! = ', Fact3[20], ' exactly*n']

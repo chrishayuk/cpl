@@ -1,0 +1,26 @@
+|| The Josephus problem: n people stand in a ring and every k-th is
+|| counted out. The ring is a list joined to itself, made by assigning
+|| to the tail of its last cell: Hd and Tl are L-values.
+
+prefer general
+
+let Ring[integer n] = value of
+   $( let Last = List1[n]
+      let l = Last
+      for i = step n - 1, -1, 1 do l := Cons[i, l]
+      Tl[Last] := l
+      result is Last $)              || the cell before number 1
+
+let rt Josephus[integer n, k] be
+   $( let p = Ring[n]
+      Write[n, ' in a ring, every ', k, ': ']
+      for i = step 1, 1, n - 1 do
+         $( for j = step 1, 1, k - 1 do p := Tl[p]
+            Write[Hd[Tl[p]], ' ']
+            Tl[p] := Tl[Tl[p]] $)
+      Write[' leaving ', Hd[p], '*n']
+      Tl[p] := NIL $)                || undo the ring, so that it can be freed
+
+Josephus[7, 3]
+Josephus[10, 2]
+Josephus[41, 3]

@@ -1,0 +1,26 @@
+|| Strings (Elementary Programming Manual, section 26). One infixed
+|| operator, the concatenating <=>, and a set of basic functions.
+
+let s = 'Combined Programming Language'
+Write[Length[s], ' ', First[s], ' ', Last[s], ' ', Character[10, s], ' ', Initials[8, s], ' ', Finals[8, s], '*n']
+
+|| The initials of each word.
+let Acronym[string t] = value of
+   $( let r, w = '', true
+      for i = step 1, 1, Length[t] do
+         $( let c = Character[i, t]
+            if w /\ c ~= ' ' do r := r <=> c
+            w := c = ' ' $)
+      result is r $)
+Write[Acronym[s], ' led to B', Acronym[s], ', then B, then ', Finals[1, Acronym['Basic C']], '*n']
+
+|| Reversal, recursively.
+let rec Reverse[string t] = t = '' -> '', Reverse[Finals[Length[t] - 1, t]] <=> First[t]
+Write[Reverse['Strachey'], '*n']
+
+|| "A longer string is greater than a shorter string identical to its
+|| starting characters."
+Write['Atlas' < 'Atlas 2', ' ', 'Titan' > 'Atlas', ' ', 'a' = 'a', '*n']
+
+|| Escapes: *n newline, *s space, *t tab, *' quote, ** star.
+Write['a*sb*tc*'d**e*n']

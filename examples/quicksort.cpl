@@ -1,0 +1,27 @@
+|| Quicksort (Hoare, 1961) as a recursive routine on part of a vector.
+
+let rec rt Quick[vector v, index l, r] be
+   $( if l >= r return
+      let p = v[Quot[l + r, 2]]
+      let i, j = l, r
+      $( while v[i] < p do i := i + 1
+         while v[j] > p do j := j - 1
+         if i <= j do
+            $( v[i], v[j] := v[j], v[i]
+               i, j := i + 1, j - 1 $) $) repeat until i > j
+      Quick[v, l, j]
+      Quick[v, i, r] $)
+
+let n = 20
+let v = Newarray[index, (1, n)]
+|| Scrambled numbers from a linear congruence.
+$( let x = 7
+   for i = 1 to n do
+      $( x := Rem[37x + 11, 101]
+         v[i] := x $) $)
+
+for i = 1 to n do Write[v[i], ' ']
+Write['*n']
+Quick[v, 1, n]
+for i = 1 to n do Write[v[i], ' ']
+Write['*n']

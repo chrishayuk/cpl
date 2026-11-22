@@ -1,0 +1,22 @@
+|| Palindromes: a recursive test on strings with First, Last, Initials
+|| and Finals, after a pass that keeps only the letters.
+
+let Letters[string s] = value of
+   $( let r = ''
+      for i = step 1, 1, Length[s] do
+         $( let c = Character[i, s]
+            if 'a' <= c <= 'z' do r := r <=> c
+            if 'A' <= c <= 'Z' do r := r <=> String[Index[c] + 32] $)
+      result is r $)
+
+let rec Same[string s] = Length[s] < 2 -> true,
+                         First[s] ~= Last[s] -> false,
+                         Same[Initials[Length[s] - 2, Finals[Length[s] - 1, s]]]
+
+let rt Try[string s] be
+   Write['*'', s, '*' ', (Same[Letters[s]] -> 'is', 'is not'), ' a palindrome*n']
+
+Try['Able was I ere I saw Elba']
+Try['A man, a plan, a canal: Panama']
+Try['Combined Programming Language']
+Try['Madam, I*'m Adam']

@@ -1,0 +1,5 @@
+100.0 C is 212.0 F
+after Fahrenheit[] := 32, c = 0.0
+after f := f + 18,        c = 10.0
+after Double[Fahrenheit[]], c = 37.7777777778
+Sym[3, 1] = 7.0   Sym[2, 4] = 5.0

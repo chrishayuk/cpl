@@ -1,0 +1,38 @@
+|| Lists, "similar in many respects to those of the LISP system" (The
+|| Main Features of CPL, 1963, section 23). The members of a list may be
+|| of any type, and may themselves be lists.
+
+prefer general            || a parameter with no specifier is general
+
+let rec Map[f, l] = Null[l] -> NIL, Cons[f[Hd[l]], Map[f, Tl[l]]]
+let rec Filter[p, l] = Null[l] -> NIL,
+                       p[Hd[l]] -> Cons[Hd[l], Filter[p, Tl[l]]],
+                       Filter[p, Tl[l]]
+let rec Fold[f, z, l] = Null[l] -> z, f[Hd[l], Fold[f, z, Tl[l]]]
+let rec Upto[a, b] = a > b -> NIL, Cons[a, Upto[a + 1, b]]
+
+let l = Upto[1, 10]
+Write['l         = ', l, '*n']
+Write['squares   = ', (Map[Sq, l] where Sq[x] = x x), '*n']
+Write['evens     = ', (Filter[Even, l] where Even[x] = Rem[x, 2] = 0), '*n']
+Write['sum       = ', (Fold[Plus, 0, l] where Plus[a, b] = a + b), '*n']
+Write['mixed     = ', List[1, 'two', 3.5, true, List['nested', NIL]], '*n']
+
+|| Functions are data items: here one is built and returned.
+let Compose[f, g] = h where h[x] = f[g[x]]
+let Twice[f] = Compose[f, f]
+let Inc[x] = x + 1
+Write['Twice[Twice[Inc]][0] = ', Twice[Twice[Inc]][0], '*n']
+
+|| A list of functions.
+let Apply[f] = f[2]
+Write['applied   = ', Map[Apply, List[Sqrt, Exp, Inc, Twice[Sqrt]]], '*n']
+
+|| Hd and Tl have L-values, so a list can be altered in place.
+let m = List[1, 2, 3]
+Hd[Tl[m]] := 'changed'
+Write['m         = ', m, '*n']
+
+|| "In order to specify the members of a list individually, a transfer
+|| function is provided ... Members" (1963, section 23).
+Write['Members   = ', (Fold[Plus, 0, List[Members[l], 100]] where Plus[a, b] = a + b), '*n']

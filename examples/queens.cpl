@@ -1,0 +1,31 @@
+|| The eight queens, with a recursive routine, a free routine as a
+|| parameter, and Boolean vectors.
+
+let n = 8
+let c = Newarray[Boolean, (1, n)]
+let u = Newarray[Boolean, (2, 2n)]          || rising diagonals, by i + j
+let d = Newarray[Boolean, (1 - n, n - 1)]   || falling diagonals, by i - j
+let q = Newarray[index, (1, n)]
+for i = 1 to n do c[i] := true
+for i = 2 to 2n do u[i] := true
+for i = 1 - n to n - 1 do d[i] := true
+
+let Solutions = 0
+
+let rt Show[] be
+   $( Solutions := Solutions + 1
+      if Solutions = 1 do
+         for i = 1 to n do
+            $( for j = 1 to n do Write[q[i] = j -> ' Q', ' .']
+               Write['*n'] $) $)
+
+let rec rt Place[index i, routine r] be
+   $( for j = 1 to n do
+         if c[j] /\ u[i + j] /\ d[i - j] do
+            $( q[i] := j
+               c[j], u[i + j], d[i - j] := false, false, false
+               test i = n then r[] or Place[i + 1, r]
+               c[j], u[i + j], d[i - j] := true, true, true $) $)
+
+Place[1, Show]
+Write[Solutions, ' solutions*n']

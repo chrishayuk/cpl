@@ -1,0 +1,31 @@
+|| Conway's game of Life on a small board that wraps round at the edges.
+|| A glider crosses it.
+
+let n = 8
+let a, b = Newarray[Boolean, (0, n - 1), (0, n - 1)], Newarray[Boolean, (0, n - 1), (0, n - 1)]
+
+for i = 0 to n - 1 do
+   for j = 0 to n - 1 do a[i, j] := false
+a[0, 1], a[1, 2], a[2, 0], a[2, 1], a[2, 2] := true, true, true, true, true
+
+let rt Show[matrix m, index g] be
+   $( Write['generation ', g, '*n']
+      for i = 0 to n - 1 do
+         $( for j = 0 to n - 1 do Write[m[i, j] -> ' O', ' .']
+            Write['*n'] $) $)
+
+let Neighbours[matrix m, index i, j] = value of
+   $( let s be index
+      s := 0
+      for p = -1 to 1 do
+         for q = -1 to 1 do
+            if (p ~= 0 \/ q ~= 0) /\ m[Rem[i + p + n, n], Rem[j + q + n, n]] do s := s + 1
+      result is s $)
+
+for g = 0 to 4 do
+   $( if Rem[g, 2] = 0 do Show[a, g]
+      for i = 0 to n - 1 do
+         for j = 0 to n - 1 do
+            $( let k = Neighbours[a, i, j]
+               b[i, j] := k = 3 \/ (k = 2 /\ a[i, j]) $)
+      a, b := b, a $)

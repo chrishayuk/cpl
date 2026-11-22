@@ -1,0 +1,26 @@
+|| Tagged section brackets (Reference Manual 2.1.3): "A closing section
+|| bracket corresponds to the nearest opening bracket earlier in the
+|| program which bears the same tag ... and it implies the closure at
+|| this point of any contained sections of program which have not yet
+|| been closed."
+
+let rt Table[index n] be
+$(T
+   for i = 1 to n do
+   $(Row
+      for j = 1 to n do
+      $(Col
+         Write[i j, ' ']
+         if j = i do
+         $( Write['*n']
+            goto Next
+   $)Col                        || closes two sections
+ Next:
+$)T                             || closes the cycle body and the routine
+Table[4]
+
+|| The layout rules (2.1.2): the end of a line ends a command unless the
+|| command could not end there; a semicolon does the same within a line.
+let a, b = 1, 2; let c = a +
+                         b
+Write[a, ' ', b, ' ', c, '*n']

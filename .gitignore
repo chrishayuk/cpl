@@ -1,0 +1,4 @@
+target
+.DS_Store
+# the scanned documents and their text: see sources/README.md
+sources/*/

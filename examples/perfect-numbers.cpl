@@ -1,0 +1,19 @@
+|| Perfect numbers: those equal to the sum of their proper divisors.
+
+prefer integer
+
+let Divisors[n] = value of
+   $( let s = 1
+      let d = 2
+      while d d <= n do
+         $( if Rem[n, d] = 0 do s := s + d + (d d = n -> 0, Quot[n, d])
+            d := d + 1 $)
+      result is s $)
+
+for n = 2 to 10000 do
+   if Divisors[n] = n do Write[n, ' is perfect*n']
+
+|| Amicable pairs: each is the sum of the other's divisors.
+for n = 2 to 3000 do
+   $( let m = Divisors[n]
+      if m > n /\ Divisors[m] = n do Write[n, ' and ', m, ' are amicable*n'] $)

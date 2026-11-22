@@ -1,0 +1,15 @@
+|| The Mandelbrot set, with the complex numbers of the language. z and c
+|| are complex; z z + c is complex arithmetic and Mod is the modulus.
+
+let Inside[complex c] = value of
+   $( let z = Cpx[0, 0]
+      for i = 1 to 30 do
+         $( z := z z + c
+            if Mod[z] > 2 result is i $)
+      result is 0 $)
+
+for y = step 1.2, -0.12, -1.2 do
+   $( for x = step -2.1, 0.04, 0.8 do
+         $( let n = Inside[Cpx[x, y]]
+            Write[n = 0 -> '#', n > 10 -> '+', n > 5 -> '.', ' '] $)
+      Write['*n'] $)

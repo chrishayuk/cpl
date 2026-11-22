@@ -1,0 +1,22 @@
+|| Section 21 (b) of the Elementary Programming Manual, as printed: "This
+|| routine sets I to the integral of f(x) dx from a to b, using a Gaussian
+|| 3-point formula." The function to be integrated is a parameter.
+
+routine Gaussquad[real a, b, ref I, val function f] be
+$( let s = (b - a)
+   I := s (.27778 f[a + .11270s] +
+           .44444 f[a + .50000s] +
+           .27778 f[a + .88730s]) $)
+
+let I = 0
+
+Gaussquad[0, 1, I, Exp]
+Write['integral of Exp from 0 to 1    ', I, '   (e - 1 = ', Exp[1] - 1, ')*n']
+
+Gaussquad[0, 2 Arctan[1], I, Sin]
+Write['integral of Sin from 0 to pi/2 ', I, '*n']
+
+|| Three points integrate a polynomial of the fifth degree exactly, as
+|| far as the five figures of the constants allow.
+Gaussquad[0, 1, I, Fifth] where Fifth[x] = 6x**5
+Write['integral of 6x****5 from 0 to 1  ', I, '*n']

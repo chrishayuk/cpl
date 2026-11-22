@@ -1,0 +1,28 @@
+|| Section 21 (a) of the Elementary Programming Manual, as printed: the
+|| scalar product of two vectors, with a jump to a label if they are
+|| orthogonal. The test x << 1 asks whether x is negligible beside 1.
+
+routine Scalarproduct[ref real x, val vector A, B, index n, label L] be
+$( x := 0
+   for i = 1 to n do x := x + A[i] B[i]
+   if x << 1 go to L $)
+
+|| "The routine call Scalarproduct[X, CAT, DOG, 10, ORTH] will set X equal
+|| to the scalar product of two vectors CAT and DOG, each of which has ten
+|| elements subscripted from 1 to 10. If the vectors are orthogonal control
+|| goes to the command labelled ORTH."
+let X = 0
+let CAT, DOG = Newarray[real, (1, 10)], Newarray[real, (1, 10)]
+
+for i = 1 to 10 do CAT[i], DOG[i] := i, 11 - i
+Scalarproduct[X, CAT, DOG, 10, ORTH]
+Write['CAT . DOG = ', X, '*n']
+
+|| Now make them orthogonal: (1, 1, 0, ...) and (1, -1, 0, ...).
+for i = 1 to 10 do CAT[i], DOG[i] := 0, 0
+CAT[1], CAT[2], DOG[1], DOG[2] := 1, 1, 1, -1
+Scalarproduct[X, CAT, DOG, 10, ORTH]
+Write['this line is not reached*n']
+finish
+
+ORTH: Write['CAT and DOG are orthogonal*n']

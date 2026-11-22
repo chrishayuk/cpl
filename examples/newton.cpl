@@ -1,0 +1,12 @@
+|| Square roots by Newton's method. The loop stops when the correction
+|| is negligible beside the root: that is what << means.
+
+let Root[real a] = value of
+   $( let x, d = a, 1
+      until d << x do
+         $( d := (a/x - x)/2
+            x := x + d $)
+      result is x $)
+
+for a = 2, 3, 10, 144, 0.25 do
+   Write['Root[', a, '] = ', Root[a], '     Sqrt gives ', Sqrt[a], '*n']
