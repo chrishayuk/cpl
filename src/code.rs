@@ -115,8 +115,6 @@ pub enum Op {
     Jump(usize),
     JumpIfFalse(usize),
     JumpIfTrue(usize),
-    AndJump(usize),
-    OrJump(usize),
     Call {
         n: usize,
         lmode: bool,

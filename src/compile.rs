@@ -227,7 +227,7 @@ impl Compiler {
 
     fn patch(&mut self, at: usize, target: usize) {
         match &mut self.cur().code[at] {
-            Op::Jump(t) | Op::JumpIfFalse(t) | Op::JumpIfTrue(t) | Op::AndJump(t) | Op::OrJump(t) => *t = target,
+            Op::Jump(t) | Op::JumpIfFalse(t) | Op::JumpIfTrue(t) => *t = target,
             Op::ForNext { exit, .. } => *exit = target,
             _ => unreachable!(),
         }
@@ -1229,16 +1229,12 @@ impl Compiler {
                 t
             }
             Expr::Bin(op @ (BinOp::And | BinOp::Or), a, b) => {
+                // Both operands are evaluated: "an operator may be applied
+                // to its operands at any time after each of them has been
+                // evaluated" (4.2). There is no short cut.
                 let ta = self.expr(a, Mode::R)?;
-                let j = self.emit(if *op == BinOp::And {
-                    Op::AndJump(0)
-                } else {
-                    Op::OrJump(0)
-                });
                 let tb = self.expr(b, Mode::R)?;
                 self.emit(Op::Bin(*op));
-                let end = self.here();
-                self.patch(j, end);
                 if ta == tb {
                     ta
                 } else {

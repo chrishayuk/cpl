@@ -585,8 +585,10 @@ qa("How do I write and, or and not in CPL?",
 let p, q = true, false
 Write[p /\ q, ' ', p \/ q, ' ', ~p, ' ', p == q, ' ', p ~== q, '*n']
 """) +
-   "\n\nIn this implementation `/\\` and `\\/` do not evaluate their second operand "
-   "when a Boolean first operand settles the result.")
+   "\n\nBoth operands are always evaluated: the manual lets an operator be "
+   "applied \"at any time after each of them has been evaluated\" (4.2), so there "
+   "is no short cut. To guard a test, use a conditional expression: "
+   "`(i <= n -> A[i] > 0, false)`.")
 
 qa("How do I write an if statement in CPL?",
    "`if b do C` obeys the command `C` if `b` is true, and `unless b do C` if it is "
@@ -1939,8 +1941,7 @@ qa("What parts of CPL are not implemented in this system?",
 qa("What extensions does this CPL add to the language of the papers?",
    "A few small ones. `let rec f[..] = .. and g[..] = ..` makes the group "
    "mutually recursive, where the manual wants the group in section brackets. "
-   "Declarations may appear anywhere in a block. `/\\` and `\\/` do not evaluate "
-   "their second operand when a Boolean first operand settles the result. "
+   "Declarations may appear anywhere in a block. "
    "`Type[x]` gives the current type of a data item and `Cpx[a, b]` makes a "
    "complex number; neither is in the papers. List equality with `=` compares "
    "members. `#x` for hexadecimal logical constants is an extra, and `{` and `}` "

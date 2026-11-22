@@ -76,8 +76,8 @@ applies to the parameters after it.
 | --- | --- |
 | `B -> E1, E2` | conditional |
 | `==` `~==` | equivalent, not equivalent |
-| `\/` | or |
-| `/\` | and |
+| `\/` | or; both operands are evaluated |
+| `/\` | and; both operands are evaluated |
 | `=` `~=` `<` `<=` `>` `>=` `<<` `>>` | relations; may be chained |
 | `<=>` | joining strings |
 | `+` `-` | |

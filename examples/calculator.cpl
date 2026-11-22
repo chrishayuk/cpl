@@ -5,12 +5,14 @@
 ||     term       = factor { * factor | / factor }
 ||     factor     = number | ( expression ) | - factor
 || and a label to jump to, from however deep, when the line is wrong.
+|| /\ evaluates both its operands (4.2), so a test that must not look past
+|| the end of the line is a conditional expression.
 
 let s = ''            || the line
 let p = 1             || the place reached in it
 
 let Peek[] == value of
-   $( while p <= Length[s] /\ Character[p, s] = ' ' do p := p + 1
+   $( while (p <= Length[s] -> Character[p, s] = ' ', false) do p := p + 1
       result is (p > Length[s] -> '', Character[p, s]) $)
 
 let Digit[string c] = '0' <= c <= '9'
@@ -18,7 +20,7 @@ let Digit[string c] = '0' <= c <= '9'
 let Number[label Bad] == value of
    $( let n, Places = 0, 0
       unless Digit[Peek[]] go to Bad
-      while p <= Length[s] /\ (Digit[Character[p, s]] \/ Character[p, s] = '.') do
+      while (p <= Length[s] -> Digit[Character[p, s]] \/ Character[p, s] = '.', false) do
          $( let c = Character[p, s]
             test c = '.' then Places := 1
             or $( n := 10n + Index[c] - 48

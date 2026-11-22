@@ -653,16 +653,6 @@ impl Vm {
                     return Ok(Flow::Jump(*t));
                 }
             }
-            Op::AndJump(t) => {
-                if let Some(Value::Bool(false)) = f.stack.last() {
-                    return Ok(Flow::Jump(*t));
-                }
-            }
-            Op::OrJump(t) => {
-                if let Some(Value::Bool(true)) = f.stack.last() {
-                    return Ok(Flow::Jump(*t));
-                }
-            }
             Op::Call { .. } | Op::CallCmd(_) => unreachable!("calls are made by obey"),
             Op::Closure(p) => {
                 let c = self.closure(f, p)?;

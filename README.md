@@ -622,11 +622,17 @@ to within 1 part in 10⁹; otherwise use `Round` or `Intpt`.
 
 **Small extensions.** `let rec f[..] = .. and g[..] = ..` makes the group
 mutually recursive (the manual wants the group in section brackets).
-Declarations may appear anywhere in a block. `/\` and `\/` do not evaluate
-their second operand when a Boolean first operand settles the result, which
-the "any order" rule of 4.2 permits. `Type[x]` gives the current type of a
+Declarations may appear anywhere in a block. `Type[x]` gives the current type of a
 data item and `Cpx[a, b]` makes a complex number; neither is in the papers.
 List equality with `=` compares members.
+
+**Boolean operators.** `/\` and `\/` evaluate both their operands, as 4.2
+requires: an operator "may be applied to its operands at any time after each
+of them has been evaluated". Up to version 0.1.1 they skipped the second
+operand when the first settled the result, and this README said 4.2 permitted
+that; it does not, and the short cut has been removed. A test that must not
+evaluate its second part is written as a conditional expression,
+`(i <= n -> A[i] > 0, false)`.
 
 **Not implemented.**
 

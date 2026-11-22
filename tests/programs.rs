@@ -81,6 +81,17 @@ fn grouping_follows_the_table_of_precedences() {
 }
 
 #[test]
+fn and_and_or_evaluate_both_operands() {
+    // 4.2: "An operator may be applied to its operands at any time after
+    // each of them has been evaluated." No short cut.
+    assert_eq!(
+        run("let n = 0\nlet Hit[] == value of $( n := n + 1; result is true $)\n\
+             Write[false /\\ Hit[], ' ', true \\/ Hit[], ' ', n]"),
+        "false true 2.0"
+    );
+}
+
+#[test]
 fn keywords_are_reserved_words_and_other_runs_are_products() {
     // `ab` is a times b; `in` is the basic symbol, so i times n needs a space.
     assert_eq!(run("let a, b, i, n = 2, 3, 4, 5\nWrite[ab, ' ', i n]"), "6.0 20.0");
