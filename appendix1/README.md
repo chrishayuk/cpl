@@ -15,7 +15,7 @@ This directory has that program, transcribed from the scans of pages 2 to
 | File | |
 | --- | --- |
 | `preprocessor.cpl` | the program with its slips put right, each marked `\|\| printed:` |
-| `preprocessor-as-printed.cpl` | the same with the slips as printed; it does not compile |
+| `preprocessor-as-printed.cpl` | the same with the slips as printed; it does not compile. Its Part 3 is the same reconstruction as in `preprocessor.cpl`, so only Part 2 is as printed |
 | `sample.pub`, `sample.out` | a small program in the implementation alphabet, and what the preprocessor makes of it |
 | `itself.pub`, `itself.out` | Part 2 of the corrected program as it would be printed, and the preprocessor's output when given it |
 | `itself-as-printed.pub`, `itself-as-printed.out` | the same for Part 2 as printed |
@@ -88,27 +88,50 @@ the program plainly expects it to return. "The basic symbol set of
 canonical CPL", which `Standardizable` needs, is taken to be the list
 called `Canonical`.
 
+These supplied definitions are ours, not the appendix's, and three of them
+go beyond what Part 3 says:
+
+- (a) `CanEndCommand` ends its list with "index integer real etc.". The
+  "etc." is read as the other types and the Boolean constants `true` and
+  `false`. Up to version 0.1.1 `true` and `false` were left out, so the `;`
+  that the end of a line like `let b = true` stands for was lost; the
+  independent review found it. *Interpretation.*
+- (c) also accepts the empty string, which is what `LastOutput` holds
+  before anything has been written; without it a `do` is put in before a
+  program's first `if`. *Ours*: a consequence of how the reconstruction
+  starts.
+- `Canonical` has `goto`, not `go`, to agree with the reading of (f) in
+  slip 11. *Ours.*
+
 ## The slips
 
-These are readings of a scan of a typescript, by one reader. Each can be
+These are readings of a scan of a typescript, by one reader. Each is
+labelled by kind: a **slip** is wrong under any reading of the source; a
+**conflict** is a place where the sources say two things and the printed
+text follows the other one; an **interpretation** is our reading of what
+was meant; **ours** is a consequence of choices made in this
+reconstruction. Each can be
 checked against the page given (pages of the appendix; add 119 for the
 page of the PDF, whose address is in [`sources/README.md`](../sources/README.md)),
 and [`scans/`](scans) has a small detail of the page for each one. The corrections written on the copy by
 hand (`:=` for `: =` throughout, `return` for `goto Switch` on page 3,
 `Switch` for `Next` on page 4) are taken as part of the text and are not
-counted.
+counted. The last two are slips the annotator caught. The first may be
+only a matter of typing: 3.1.2 lets `:=` "occupy two print positions";
+but the program's own `case ':'` reads `:` followed by a space as `:`, so
+on its own terms the space is a slip.
 
 Seven stop the program from compiling at all:
 
-| | Page | As printed | Should be | What happens |
-| --- | --- | --- | --- | --- |
-| 1 | 2 | `ReadTag` opens `§R.T` and closes `§̸R.T.` | the same tag | no open section is tagged `R.T.` |
-| 2 | 3 | `ReadUnderlinedWord` opens `§R.U.W` and closes `§̸R.U.W.` | the same tag | likewise |
-| 3 | 3 | `ReadSpaces` opens `§R.S.` (the last mark is faint) and closes `§̸R.S` | the same tag | likewise |
-| 4 | 3 | `Proprocessor ['§', s, Mismatch]` | `Preprocessor` | the name is not defined |
-| 5 | 3 | `case ')'` with no colon | `case ')' :` | `:` expected |
-| 6 | 4 | `goto switch` | `goto Switch` | a small-letter name is one letter, so this is not a label |
-| 7 | 5 | `s := standard [s <=> s']` | `Standard` | the same: `standard` is eight names side by side |
+| | Page | As printed | Should be | Kind | What happens |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 2 | `ReadTag` opens `§R.T` and closes `§̸R.T.` | the same tag | slip | no open section is tagged `R.T.` |
+| 2 | 3 | `ReadUnderlinedWord` opens `§R.U.W` and closes `§̸R.U.W.` | the same tag | slip | likewise |
+| 3 | 3 | `ReadSpaces` opens `§R.S.` (the last mark is faint) and closes `§̸R.S` | the same tag | slip, on this reading of the faint mark | likewise |
+| 4 | 3 | `Proprocessor ['§', s, Mismatch]` | `Preprocessor` | slip | the name is not defined |
+| 5 | 3 | `case ')'` with no colon | `case ')' :` | slip | `:` expected |
+| 6 | 4 | `goto switch` | `goto Switch` | slip | a small-letter name is one letter, so this is not a label |
+| 7 | 5 | `s := standard [s <=> s']` | `Standard` | slip | the same: `standard` is eight names side by side |
 
 A dot counts as part of a tag by the program's own rule
 (`Letter.Digit.Dot`), which is why 1 to 3 are mismatches and not full
@@ -116,30 +139,41 @@ stops.
 
 Two let it run and give the wrong answer:
 
-| | Page | As printed | Should be | What happens |
-| --- | --- | --- | --- | --- |
-| 8 | 3 | `ReadUnderlinedWord` begins `s := c` | `s := ''` | the first letter of every word is taken twice: `l̲let` |
-| 9 | 3 | after a comma, `ReadSpaces [c]` and then `Output [','] ; NextChar [c]` | no `NextChar` | `ReadSpaces` has already moved on, so the character after every comma is lost: `a, b = 1, 2` comes out as `a , = 1 ,` |
+| | Page | As printed | Should be | Kind | What happens |
+| --- | --- | --- | --- | --- | --- |
+| 8 | 3 | `ReadUnderlinedWord` begins `s := c` | `s := ''` | slip | the first letter of every word is taken twice: `l̲let` |
+| 9 | 3 | after a comma, `ReadSpaces [c]` and then `Output [','] ; NextChar [c]` | no `NextChar` | slip | `ReadSpaces` has already moved on, so the character after every comma is lost: `a, b = 1, 2` comes out as `a , = 1 ,` |
 
 ![Slips 5 and 9, with a correction made by hand](scans/slips-5-9-case-and-comma.png)
 
 And in two places the informal definitions of Part 3 disagree with the
 program of Part 2:
 
-| | Page | As printed | Taken as | What happens |
-| --- | --- | --- | --- | --- |
-| 10 | 6 | (c) `CannotProceedCommand` "is true if LastOutput is any of" `;` `§` `do` `:` `or` | true if it is *none* of them | those are the symbols that can precede a command; as printed a `do` is put in after every semicolon and never where it is wanted |
-| 11 | 6 | (f) `Standard` gives `go` "if x is" `goto` | no such row | (b) and (d) list `goto`, so as printed no `do` is put in before a jump |
+| | Page | As printed | Taken as | Kind | What happens |
+| --- | --- | --- | --- | --- | --- |
+| 10 | 6 | (c) `CannotPreceedCommand` (so it reads; the c and e are hard to tell apart, and Part 2 calls it `CannotProceedCommand`) "is true if LastOutput is any of" `;` `§` `do` `:` `or` | true if it is *none* of them | conflict | those are the symbols that can precede a command; as printed a `do` is put in after every semicolon and never where it is wanted |
+| 11 | 6 | (f) `Standard` gives `go` "if x is" `goto` | no such row | conflict | (b) and (d) list `goto`, so as printed no `do` is put in before a jump |
 
-The second kind are perhaps better called open questions than slips: Part
-3 says of itself that it is informal.
+These two are better called open questions than slips: Part 3 says of
+itself that it is informal, and neither correction is the only one
+possible. For 10, Part 2 could as well be changed to call
+`~CannotProceedCommand`, which, with the same care over the empty string,
+works as well; for 11, the row could
+be kept and (b), (d) and `Canonical` changed to `go`. The change is made
+in Part 3 because Part 3 is the informal part. With 10 goes the empty
+string in the list, and with 11 the change of `go` to `goto` in
+`Canonical`, both described above as ours; `tests/appendix1.rs` puts the
+second back as a twelfth entry in its list of differences, and the
+trial's output does not depend on it.
 
-One more thing is not a slip but is worth seeing. The program is written
-with the switch-command, which had only just been added to the language
-(its definition is on the last page of the same appendix). Part 3 was not
-brought up to date with it: `jump` is not `Combinable`, so the
-preprocessor, given its own text, writes `jump on` and `the rest` as two
-symbols each.
+One more thing is not corrected but is worth seeing. The program is
+written with the switch-command, which had only just been added to the
+language (its definition is on the last page of the same appendix). Part 3
+was not brought up to date with it: neither `jump` nor `the` is
+`Combinable`, so the preprocessor, given its own text, writes `jump on` and
+`the rest` as two symbols each. Its output for its own text is therefore
+not fully canonical. (A conflict between Part 3 and the appendix's last
+page; left as printed.)
 
 ## Given its own text
 

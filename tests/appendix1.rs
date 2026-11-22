@@ -201,3 +201,14 @@ fn publication_form_means_the_same_as_the_ascii_form() {
         assert_eq!(toks(&src), toks(&cpl::lexer::publication(&src)), "{}", path.display());
     }
 }
+
+#[test]
+fn a_line_ending_in_a_boolean_constant_ends_a_command() {
+    // Part 3 (a) lists what can end a command, ending "index integer real
+    // etc."; true and false are read as part of the etc. Without them the
+    // ; that the end of the first line stands for was lost.
+    let input = "l\u{332}e\u{332}t\u{332} b = t\u{332}r\u{332}u\u{332}e\u{332}\nWrite[b]\n";
+    let (out, r) = run(&read("preprocessor.cpl"), input);
+    assert_eq!(r, Ok(()));
+    assert_eq!(out, "letøN\u{338}bø=øtrueø; øN\u{338}Writeø[øN\u{338}bø]ø");
+}

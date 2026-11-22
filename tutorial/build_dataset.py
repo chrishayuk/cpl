@@ -1778,7 +1778,8 @@ qa("How do I run the 1966 preprocessor?",
    "\n\nand the preprocessor makes this of it:\n\n"
    + tool(["appendix1/preprocessor.cpl"],
           (ROOT / "appendix1" / "sample.pub").read_text(encoding="utf-8")) +
-   "\n\n`tests/appendix1.rs` runs all of this and checks each of the eleven slips.")
+   "\n\n`tests/appendix1.rs` runs all of this and checks each of the eleven "
+   "corrections.")
 
 qa("How does the 1966 preprocessor use labels?",
    "It closes sections by recursion. `Preprocessor` calls itself for each opening "
@@ -1802,7 +1803,9 @@ qa("How many slips are there in the 1966 CPL preprocessor as printed?",
    "copy by hand (`:=` for `: =` throughout, `return` for `goto Switch` on page 3, "
    "`Switch` for `Next` on page 4) are taken as part of the text and are not "
    "counted. The list is the reading of a scan of a typescript by one reader, and "
-   "each slip can be checked against the page given.")
+   "each slip can be checked against the page given. The first nine are slips, "
+   "wrong under any reading; the last two are conflicts between two parts of the "
+   "appendix, which could have been resolved another way.")
 
 qa("Which slips stop the 1966 preprocessor from compiling?",
    "Seven, numbered 1 to 7 in the project's list, with the page of the appendix:\n\n"
@@ -1847,15 +1850,18 @@ qa("Which slips make the 1966 preprocessor give the wrong answer?",
 qa("Where does Part 3 of the preprocessor appendix disagree with the program?",
    "In two places, numbered 10 and 11 in the project's list, both on page 6. Part "
    "3 defines informally the functions that Part 2 uses.\n\n"
-   "10. Definition (c) says `CannotProceedCommand` \"is true if LastOutput is any "
+   "10. Definition (c) says `CannotPreceedCommand` (so the scan reads; Part 2 "
+   "calls it `CannotProceedCommand`) \"is true if LastOutput is any "
    "of\" `;` `§` `do` `:` `or`. It is taken as true if it is none of them. Those "
    "are the symbols that can precede a command; as printed a `do` is put in after "
    "every semicolon and never where it is wanted.\n"
    "11. Definition (f) says `Standard` gives `go` \"if x is\" `goto`. That row is "
    "taken out. Definitions (b) and (d) list `goto`, so as printed no `do` is put "
    "in before a jump.\n\n"
-   "The project's notes say these are perhaps better called open questions than "
-   "slips, since Part 3 says of itself that it is informal.")
+   "These are conflicts, better called open questions than slips, since Part 3 "
+   "says of itself that it is informal, and neither correction is the only one "
+   "possible: for 10, Part 2 could as well negate its call; for 11, the row could "
+   "be kept and `goto` changed to `go` elsewhere.")
 
 qa("What are the eleven slips in the 1966 CPL preprocessor?",
    "In the project's numbering, with pages of the appendix:\n\n"
@@ -1870,7 +1876,8 @@ qa("What are the eleven slips in the 1966 CPL preprocessor?",
    "letter of every word is taken twice.\n"
    "9. Page 3: an extra `NextChar [c]` after a comma, so the character after "
    "every comma is lost.\n"
-   "10. Page 6: Part 3 (c) says `CannotProceedCommand` is true if `LastOutput` is "
+   "10. Page 6: Part 3 (c) says `CannotPreceedCommand` (Part 2's "
+   "`CannotProceedCommand`) is true if `LastOutput` is "
    "any of `;` `§` `do` `:` `or`; it is taken as true if it is none of them.\n"
    "11. Page 6: Part 3 (f) says `Standard` gives `go` if x is `goto`; there "
    "should be no such row.\n\n"
@@ -1886,7 +1893,11 @@ qa("What had to be supplied to make the 1966 preprocessor run?",
    "`UnderlinedLetter` with `Small.UnderlinedLetter`. They are supplied too. "
    "`Report[n]` writes `?? Report n` and carries on, since the program plainly "
    "expects it to return. \"The basic symbol set of canonical CPL\", which "
-   "`Standardizable` needs, is taken to be the list called `Canonical`.")
+   "`Standardizable` needs, is taken to be the list called `Canonical`. These "
+   "definitions are the reconstruction's own. Three go beyond the text: (a) ends "
+   "its list with \"etc.\", read as the other types and `true` and `false`; (c) "
+   "also accepts the empty string that `LastOutput` holds at the start; and "
+   "`Canonical` has `goto`, not `go`, to agree with the resolution of slip 11.")
 
 qa("How are underlined and struck-through characters represented in this CPL?",
    "An underlined letter, and a letter or sign with a stroke through it, were "

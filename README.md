@@ -318,11 +318,15 @@ letøN̸aø,øN̸bø=øK̸1071ø,øK̸462ø; øiføN̸aø<øN̸bødo øgotoøN̸
 As printed it does not compile: seven slips of the typewriter stop it
 (mismatched bracket tags, `Proprocessor`, `goto switch`). With those put
 right it runs and is wrong in two ways, one of which loses the character
-after every comma. The eleven differences between the printed text and the
-one that works are listed, with page numbers, in the appendix's README,
-and `tests/appendix1.rs` checks what each one does. Corrected, the
-preprocessor can be given its own text; given its text as printed, it
-stops silently at its own first mismatched bracket.
+after every comma. Two more changes resolve places where the informal
+definitions of Part 3 disagree with the program of Part 2. These eleven
+differences are listed, with page numbers and their kind (slip or
+conflict), in the appendix's README, and `tests/appendix1.rs` checks what
+each one does. The program also needs about twenty definitions that the
+appendix gives only informally or not at all; those are written for this
+reconstruction, and the README says where they go beyond the text.
+Corrected, the preprocessor can be given its own text; given its text as
+printed, it stops silently at its own first mismatched bracket.
 
 `cpl --publication FILE` prints any program the way the papers print
 them, and the result is itself accepted as a program:
@@ -563,7 +567,7 @@ cargo test
 | `tests/programs.rs` | runs all 73 examples against their `.out` files (`CPL_BLESS=1` rewrites them), and 32 tests of single features: juxtaposition, the two kinds of function, type deduction, labels, recursion 50,000 deep, the bit functions, the output routines |
 | `tests/tutorial.rs` | runs the 205 programs of the tutorial |
 | `python3 tutorial/build_dataset.py --check` | rebuilds the dataset from real runs and fails if `tutorial/dataset/cpl.jsonl` would change |
-| `tests/appendix1.rs` | runs the 1966 preprocessor on a sample and on itself, and checks each of its eleven slips |
+| `tests/appendix1.rs` | runs the 1966 preprocessor on a sample and on itself, and checks each of the eleven corrections to it |
 | `tests/check.rs` | `cpl --check` and the analysis behind it: every example passes, and on the examples, the tutorial's programs and a set of broken ones the check finds an error exactly when the system does, with the same message |
 | `cargo test --target wasm32-wasip1` | the same, inside wasmtime |
 | `scripts/wasi-check.sh` | native and WASI builds agree on every example, byte for byte |

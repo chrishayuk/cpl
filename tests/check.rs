@@ -88,15 +88,15 @@ fn the_slips_of_1966_are_each_found() {
     assert_eq!(lines.len(), 8, "{:#?}", lines);
     assert_eq!(
         lines[0],
-        "as-printed:133:4: error: the section bracket tagged R.T is never closed"
+        "as-printed:135:4: error: the section bracket tagged R.T is never closed"
     );
     assert_eq!(
         lines[2],
-        "as-printed:139:45: error: no open section bracket is tagged R.T."
+        "as-printed:141:45: error: no open section bracket is tagged R.T."
     );
     // The system itself stops at the first of them.
     let first = cpl::compile_source(&src).unwrap_err();
-    assert_eq!(first, "line 139: no open section bracket is tagged R.T.");
+    assert_eq!(first, "line 141: no open section bracket is tagged R.T.");
 }
 
 #[test]
