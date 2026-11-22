@@ -434,7 +434,7 @@ Familiar programs:
 | `truth-tables.cpl` | Truth tables, and De Morgan's law |
 | `word-count.cpl` | Lines, words and characters of the input |
 
-## Tutorial
+## Tutorial and dataset
 
 [`tutorial/`](tutorial/01-introduction.md) is a 19-chapter tutorial that
 assumes no CPL and not much programming.
@@ -456,6 +456,10 @@ It contains 205 complete programs, each followed by its output. The test
 `tests/tutorial.rs` runs every one and compares, so the tutorial cannot
 drift from the implementation; `CPL_BLESS=1 cargo test --test tutorial`
 rewrites the outputs after a deliberate change.
+
+`tutorial/dataset/cpl.jsonl` is a small chat-format training set about
+CPL. `python3 tutorial/build_dataset.py` rebuilds it; every output in an
+answer comes from running the program.
 
 ## In the browser
 
@@ -558,6 +562,7 @@ cargo test
 | --- | --- |
 | `tests/programs.rs` | runs all 73 examples against their `.out` files (`CPL_BLESS=1` rewrites them), and 32 tests of single features: juxtaposition, the two kinds of function, type deduction, labels, recursion 50,000 deep, the bit functions, the output routines |
 | `tests/tutorial.rs` | runs the 205 programs of the tutorial |
+| `python3 tutorial/build_dataset.py --check` | rebuilds the dataset from real runs and fails if `tutorial/dataset/cpl.jsonl` would change |
 | `tests/appendix1.rs` | runs the 1966 preprocessor on a sample and on itself, and checks each of its eleven slips |
 | `tests/check.rs` | `cpl --check` and the analysis behind it: every example passes, and on the examples, the tutorial's programs and a set of broken ones the check finds an error exactly when the system does, with the same message |
 | `cargo test --target wasm32-wasip1` | the same, inside wasmtime |

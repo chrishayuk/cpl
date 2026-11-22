@@ -41,6 +41,11 @@ jobs:
       - name: Native and WASI builds print the same thing
         run: scripts/wasi-check.sh
 
+      - name: Dataset (rebuilt from real runs, it must not change)
+        run: |
+          cargo build --release
+          python3 tutorial/build_dataset.py --check
+
       - name: Browser playground (the WASI host and the language server, in node)
         run: |
           node web/build.mjs

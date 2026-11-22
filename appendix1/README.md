@@ -80,8 +80,8 @@ program's `UnderlinedLetter[c]` and `case '§̸'` work as written. `cpl
 
 Part 3 of the appendix defines thirteen of the functions that Part 2 uses
 "informally", in a sentence or a list each. They are written out at the
-head of `preprocessor.cpl`. Six more identifiers are used and never
-mentioned: `CPL.Source`, `EndofStreamChar`, `Report`, `BigLetter`,
+head of `preprocessor.cpl`. Seven more identifiers are used and never
+defined: `CPL.Source`, `EndofStreamChar`, `Report`, `BigLetter`,
 `SmallLetter`, and `UnderlinedLetter` with `Small.UnderlinedLetter`. They
 are supplied too. `Report[n]` writes `?? Report n` and carries on, since
 the program plainly expects it to return. "The basic symbol set of
@@ -128,7 +128,7 @@ program of Part 2:
 
 | | Page | As printed | Taken as | What happens |
 | --- | --- | --- | --- | --- |
-| 10 | 6 | (c) `CannotPrecedeCommand` "is true if LastOutput is any of" `;` `§` `do` `:` `or` | true if it is *none* of them | those are the symbols that can precede a command; as printed a `do` is put in after every semicolon and never where it is wanted |
+| 10 | 6 | (c) `CannotProceedCommand` "is true if LastOutput is any of" `;` `§` `do` `:` `or` | true if it is *none* of them | those are the symbols that can precede a command; as printed a `do` is put in after every semicolon and never where it is wanted |
 | 11 | 6 | (f) `Standard` gives `go` "if x is" `goto` | no such row | (b) and (d) list `goto`, so as printed no `do` is put in before a jump |
 
 The second kind are perhaps better called open questions than slips: Part
