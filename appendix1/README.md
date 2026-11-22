@@ -144,10 +144,10 @@ symbols each.
 ## Given its own text
 
 `itself.out` is the corrected preprocessor run on its own Part 2: 189
-lines in, 1,120 canonical symbols out, ending with `finish`.
+lines in, some 1,100 canonical symbols out, ending with `finish`.
 
 `itself-as-printed.out` is the corrected preprocessor run on Part 2 as
-printed. It stops after 228 symbols, at slip 1: the closing bracket of
+printed. It stops a little over 200 symbols in, at slip 1: the closing bracket of
 `ReadTag` matches no open section, every level jumps to its mismatch
 label, and the outermost one is the main program's `Error: finish`. No
 message is written, because the program has none for this case.
