@@ -227,8 +227,8 @@ qa("Which features of this CPL come from the 1963 paper and not the 1966 manual?
    "compound data structures. And a list of names matched against a list value, "
    "where \"the transfer function Members is automatically invoked\". They were "
    "added because the manual leaves a hole where they were. Where the 1963 paper and "
-   "the 1966 manual disagree, 1966 wins: for example `a/bc` is `(a/b)c`, although "
-   "in 1963 it was `a/(bc)`.")
+   "the 1966 manual disagree, 1966 wins: for example brackets round part of an "
+   "expression list have no significance, although in 1963 they made a sublist.")
 
 qa("How was CPL originally written down, and how do I type it in ASCII?",
    "CPL was written on a Flexowriter, a typewriter that punched paper tape, with "
@@ -469,12 +469,12 @@ qa("How does multiplication without a sign work in CPL?",
    "answers have decimal points.")
 
 qa("In CPL, is a/bc the same as a/(bc)?",
-   "No. Division and multiplication are done from left to right, so `a/bc` is "
-   "*a/b* times *c*, not *a* over *bc*. The manual says that writing side by side "
-   "is replaced by the multiplication sign before any further analysis.\n\n"
-   + prog("let a, b, c = 12, 2, 3\nWrite[a/b c, ' ', a/(b c), '*n']") +
-   "\n\nIn the 1963 paper `a/bc` meant `a/(bc)`; this implementation follows the "
-   "1966 manual.")
+   "Yes. Writing side by side is replaced by the multiplication sign before any "
+   "further analysis, and the table of precedences in section 6.1.4 of the 1966 "
+   "manual then makes a `/` take everything after it that is multiplied or "
+   "divided: `a/bc` is `a/(bc)`, and `a/b/c` is `a/(b/c)`. The 1963 paper says the "
+   "same of `a/bc`.\n\n"
+   + prog("let a, b, c = 12, 2, 3\nWrite[a/b c, ' ', (a/b) c, ' ', a/b/c, ' ', (a/b)/c, '*n']"))
 
 qa("What does -2 ** 2 give in CPL?",
    "A minus sign in front of something is treated as multiplication by -1, so it "
@@ -2006,7 +2006,10 @@ qa("What is the order of precedence of CPL operators?",
    "(equivalent, not equivalent); `\\/` (or); `/\\` (and); the relations `=` `~=` "
    "`<` `<=` `>` `>=` `<<` `>>`, which may be chained; `<=>` (joining strings); "
    "`+` and `-`; `*`, `/` and writing side by side; `-` in front; `**`; `~` "
-   "(not); and application, `F[E, ...]`, for functions and arrays.\n\n"
+   "(not); and application, `F[E, ...]`, for functions and arrays. A `/` takes "
+   "everything after it that is multiplied or divided, so `a/bc` is `a/(bc)`, "
+   "and the right operand of `**` takes in multiplication and division too, so "
+   "`a**bc` is `a**(bc)` (6.1.4).\n\n"
    + prog(r"""
 Write[1 + 2 * 3 ** 2, ' ', 1 < 2 /\ 2 < 3 \/ false, ' ', 'a' <=> 'b' = 'ab', '*n']
 """))

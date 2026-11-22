@@ -65,7 +65,18 @@ fn run(src: &str) -> String {
 fn juxtaposition_is_multiplication() {
     assert_eq!(
         run("let a, b = 3, 4\nWrite[a b, ' ', 2a, ' ', a(b + 1), ' ', a/b b]"),
-        "12.0 6.0 15.0 3.0"
+        "12.0 6.0 15.0 0.1875"
+    );
+}
+
+#[test]
+fn grouping_follows_the_table_of_precedences() {
+    // 6.1.4: x has PL 9, PR 9; / has PL 9, PR 8; ** has PL 10, PR 8;
+    // - has PL 6, PR 7. So a/bc is a/(bc), a/b/c is a/(b/c), pq/r is
+    // (pq)/r, a**bc is a**(bc), a**b**c is a**(b**c), a-b-c is (a-b)-c.
+    assert_eq!(
+        run("Write[12/3 2, ' ', 12/3/2, ' ', 12*3/2, ' ', 2 3/4 2, ' ', 2**3 2, ' ', 2**3**2, ' ', 2 3**2, ' ', 8-2-1, ' ', 8-2+1]"),
+        "2.0 8.0 18.0 0.75 64.0 512.0 18.0 5 7"
     );
 }
 

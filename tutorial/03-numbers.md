@@ -85,15 +85,17 @@ variable defined this way is real, which is why the answers have decimal
 points.)
 
 This is why a name longer than one letter must begin with a capital: `xy`
-is a product. It also explains a trap. Division and multiplication are
-done from left to right, so `a/bc` is *a/b* times *c*, not *a* over *bc*:
+is a product. It also settles a question that mathematicians answer the
+same way: `a/bc` is *a* over *bc*. The manual's table of precedences
+(6.1.4) makes a `/` take everything after it that is multiplied or divided,
+so `a/b/c` is *a* over *b/c* too. Brackets say otherwise when you need them:
 
 ```cpl
 let a, b, c = 12, 2, 3
-Write[a/b c, ' ', a/(b c), '*n']
+Write[a/b c, ' ', (a/b) c, ' ', a/b/c, ' ', (a/b)/c, '*n']
 ```
 ```output
-18.0 2.0
+2.0 18.0 18.0 2.0
 ```
 
 A minus sign in front of something is treated as multiplication by -1, so

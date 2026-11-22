@@ -974,22 +974,32 @@ impl Parser {
 
     /// Multiplication, division, and multiplication written by juxtaposition
     /// ("the operator is inserted before any further analysis", 6.1.3).
+    ///
+    /// Grouping follows the table of precedences of 6.1.4: x has PL 9 and
+    /// PR 9, / has PL 9 and PR 8. So a group of multiplications may be
+    /// followed by a single / , and the / takes everything after it at
+    /// this level as its right operand: a/bc is a/(bc), a/b/c is a/(b/c),
+    /// pq/r is (pq)/r. The 1963 paper gives a/bc the same meaning.
     fn term(&mut self) -> PR<Expr> {
+        let e = self.product()?;
+        if self.eat_sym("/") {
+            return Ok(Expr::Bin(BinOp::Div, Box::new(e), Box::new(self.term()?)));
+        }
+        Ok(e)
+    }
+
+    fn product(&mut self) -> PR<Expr> {
         let mut e = self.signed()?;
         loop {
-            let op = if self.eat_sym("*") {
-                BinOp::Mul
-            } else if self.eat_sym("/") {
-                BinOp::Div
+            if self.eat_sym("*") {
             } else if !self.peek().nl
                 && (matches!(self.peek().tok, Tok::Name(_) | Tok::Num(_)) || self.is_sym("("))
                 && !matches!(self.peek_at(1), Tok::Sym(":"))
             {
-                BinOp::Mul
             } else {
                 return Ok(e);
-            };
-            e = Expr::Bin(op, Box::new(e), Box::new(self.signed()?));
+            }
+            e = Expr::Bin(BinOp::Mul, Box::new(e), Box::new(self.signed()?));
         }
     }
 
@@ -1004,10 +1014,14 @@ impl Parser {
         self.power()
     }
 
+    /// The power operator has PL 10 and PR 8 (6.1.4): it binds more tightly
+    /// than x or / on its left, but its right operand is the whole of the
+    /// multiplications and division that follow it, so a**bc is a**(bc)
+    /// and a**b**c is a**(b**c).
     fn power(&mut self) -> PR<Expr> {
         let base = self.not()?;
         if self.eat_sym("**") {
-            let exp = self.signed()?;
+            let exp = self.term()?;
             return Ok(Expr::Bin(BinOp::Pow, Box::new(base), Box::new(exp)));
         }
         Ok(base)

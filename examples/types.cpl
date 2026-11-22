@@ -15,9 +15,10 @@ Write[Type[i + 1], ', ', Type[i + n], ', ', Type[n + 0.5], ', ', Type[i/2], ', '
 Write[i/2, ' ', Quot[i, 2], ' ', Rem[i, 2], ' ', 2**10, ' ', 2**0.5, '*n']
 
 || Multiplication may be written by juxtaposition; monadic minus is
-|| multiplication by -1 and so binds less tightly than **.
+|| multiplication by -1 and so binds less tightly than **. A / takes all
+|| that follows it at this level (6.1.4): a/b c is a/(bc), a/b/c is a/(b/c).
 let a, b, c = 2, 3, 4
-Write[a b c, ' ', 2a + 3b, ' ', -a**2, ' ', (a + b)(a - b), ' ', a/b c, '*n']
+Write[a b c, ' ', 2a + 3b, ' ', -a**2, ' ', (a + b)(a - b), ' ', a/b c, ' ', a/b/c, '*n']
 
 || Complex numbers.
 let z = Cpx[3, 4]

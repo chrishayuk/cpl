@@ -81,9 +81,9 @@ applies to the parameters after it.
 | `=` `~=` `<` `<=` `>` `>=` `<<` `>>` | relations; may be chained |
 | `<=>` | joining strings |
 | `+` `-` | |
-| `*` `/` and writing side by side | |
+| `*` `/` and writing side by side | `a/bc` is `a/(bc)`, `a/b/c` is `a/(b/c)` |
 | `-` in front | |
-| `**` | |
+| `**` | its right operand takes in `*` and `/`: `a**bc` is `a**(bc)` |
 | `~` | not |
 | `F[E, ...]` | application: functions, arrays |
 

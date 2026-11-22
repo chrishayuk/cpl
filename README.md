@@ -586,11 +586,16 @@ documents and to nothing else. Where they are silent, contradictory, or
 were not followed, the choice is listed here.
 
 **Which CPL.** The 1966 Reference Manual is the authority. Where the 1963
-paper disagrees, 1966 wins: `a/bc` is `(a/b)c`, because juxtaposition is
-replaced by `×` "before any further analysis" (6.1.3), although in 1963 it
-was `a/(bc)`; brackets round part of an expression list have no significance
-(4.5), although in 1963 they made a sublist. The three 1963 features above
-were added because the manual leaves a hole where they were.
+paper disagrees, 1966 wins: brackets round part of an expression list have
+no significance (4.5), although in 1963 they made a sublist. On `a/bc` the
+two agree: juxtaposition is replaced by `×` "before any further analysis"
+(6.1.3), and the table of precedences of 6.1.4 then groups `a/b×c` as
+`a/(b×c)`, as the 1963 paper does. The same table makes `a/b/c` mean
+`a/(b/c)` and `a↑bc` mean `a↑(bc)`, and that is what is done. (Up to
+version 0.1.1 this README said 1966 made `a/bc` mean `(a/b)c`, and the
+system did so; that was a misreading, found by the [independent
+review](docs/independent-review.md).) The three 1963 features above were
+added because the manual leaves a hole where they were.
 
 **Types.** CPL was to be compiled with every type known in advance. Here
 every L-value has a type fixed when it is created and every assignment and

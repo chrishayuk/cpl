@@ -262,7 +262,7 @@ fn symbol_help(symbol: &str) -> (&'static str, &'static str) {
         "+" => ("plus", "Addition, or a sign in front of a number."),
         "-" => ("minus", "Subtraction, or a sign in front of a number."),
         "*" => ("times", "Multiplication. It may be left out: `2x` and `a b` are products."),
-        "/" => ("divided by", "Division. `a/bc` is `(a/b)c`."),
+        "/" => ("divided by", "Division. It takes everything after it that is multiplied or divided: `a/bc` is `a/(bc)` and `a/b/c` is `a/(b/c)` (6.1.4)."),
         "[" | "]" => ("application", "Square brackets hold the arguments of a function or routine, the subscripts of an array, and the parameters in a definition."),
         "(" | ")" => ("brackets", "Round brackets group part of an expression."),
         "," => ("comma", "Separates the members of a list: arguments, parameters, names, or the two arms of a conditional expression."),
