@@ -26,7 +26,7 @@ Write['HCF[1071, 462] = ', HCF[1071, 462], '*n']
 HCF[1071, 462] = 21
 ```
 
-That is the Euclidean algorithm from section 24 of the 1965 *Elementary
+That is the Euclidean algorithm from section 24 of the *Elementary
 Programming Manual*, unchanged except for the character set.
 
 - **New to CPL?** Start with the [tutorial](tutorial/01-introduction.md):
@@ -123,7 +123,8 @@ Write[c, '*n']
 ```
 
 A label is a value. Passed to a routine, it is the way out when something
-goes wrong, however many calls deep. This is from the 1965 manual:
+goes wrong, however many calls deep. This is from the Elementary
+Programming Manual:
 
 ```
 routine LINEQ[real a, b, c, a', b', c', ref x, y, val label L] be
@@ -517,6 +518,10 @@ List equality with `=` compares members.
 
 **Not implemented.**
 
+- The rules for `break`, `return` and `result is` that replaced section
+  9.5. The editor's note says that section "is now largely wrong as we
+  have altered the rules ... to allow a more general use", and the new
+  rules are not given; 9.5 is followed as written.
 - Running the declarations of a block when jumping into it past them
   (9.3.2). The jump is made; a variable whose definition was skipped is
   reported when used.
@@ -607,8 +612,9 @@ has the few details of pages that the list of slips refers to.
 - *CPL Working Papers*, University of London Institute of Computer Science
   and the Mathematical Laboratory, Cambridge, July 1966. Contains the
   Reference Manual draft edited by Strachey.
-- *CPL Elementary Programming Manual*, edition of 1965 with the January 1966
-  revisions and the supplement for the pre-pilot system.
+- *CPL Elementary Programming Manual*, Edition II (Cambridge), January 1966,
+  "including corrections and revisions"; the copy read has handwritten
+  corrections and the supplement for the pre-pilot system.
 - D. W. Barron, J. N. Buxton, D. F. Hartley, E. Nixon and C. Strachey, "The
   main features of CPL", *The Computer Journal* 6 (1963), 134-143.
 - M. Richards, "How BCPL evolved from CPL", written for *The Computer

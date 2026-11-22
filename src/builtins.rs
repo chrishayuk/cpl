@@ -796,7 +796,7 @@ pub static TABLE: &[(&str, BDef)] = &[
     ("Writechar", BDef::F(b_writechar)),
     ("Printf", BDef::F(b_printf)),
     ("Printd", BDef::F(b_printd)),
-    // ---- as spelt in the supplement for the pre-pilot system of 1965
+    // ---- as spelt in the supplement for the pre-pilot system
     ("WRITE", BDef::F(b_write)),
     ("READ", BDef::F(b_read)),
     ("READCHAR", BDef::F(b_readchar)),

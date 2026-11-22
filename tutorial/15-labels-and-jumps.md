@@ -126,11 +126,12 @@ Richards' replacement for exactly this feature.
 
 ## A label remembers where it came from
 
-The reference manual tests the reader with this one (section 9.3.2). The
-routine calls itself `n` times, and each call passes on its *own* label
-`N` in place of one of the two it was given. "The effect of the routine
-call R[10, Even, Odd] is to jump to Even; that of R[9, Even, Odd] is to
-jump to Odd."
+The reference manual gives this as a "trivial example" of how ambiguities
+arise with recursive routines (section 9.3.2). The routine calls itself
+`n` times, and each call passes on its *own* label `N` in place of one of
+the two it was given. "The effect of executing R [10, Even, Odd], say, is
+to jump to the destination "Even", whereas R [9, Even, Odd] jumps to
+the destination "Odd"."
 
 ```cpl
 let rec routine R[integer n, label L, M] be
@@ -205,9 +206,13 @@ A `case` is a kind of label. Control goes to the one that matches and
 carries on from there, into the next case if nothing stops it: hence the
 `go to` at the end of each. If that seems familiar, it should. BCPL took
 this command from CPL and C took it from BCPL, falling through and all.
-What the later languages added was a tidier way out. In CPL `break` means
-only "leave the loop", so here it would have ended the `for`; BCPL
-invented `endcase`, and C made `break` do both jobs.
+What the later languages added was a tidier way out. In the manual as it
+stands `break` means only "leave the loop", so here it would have ended
+the `for`. (The editor's note at the front says that this section "is now
+largely wrong as we have altered the rules about break, return and result
+is to allow a more general use", and that the change was too complicated
+to write in. The new rules are not given anywhere, so the old ones are
+followed here.) BCPL invented `endcase`, and C made `break` do both jobs.
 
 The only large CPL program in those papers, a preprocessor of about 190
 lines ([appendix1](../appendix1/README.md)), is one big switch on the character just read, and
