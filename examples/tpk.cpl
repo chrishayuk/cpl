@@ -1,0 +1,40 @@
+|| The TPK algorithm of Knuth and Trabb Pardo, "The Early Development of
+|| Programming Languages" (Stanford STAN-CS-76-562, 1976), page 3, where it
+|| is given in ALGOL 60: read eleven numbers a[0] to a[10]; then, from
+|| a[10] down to a[0], print i and f(a[i]), where f(t) = Sqrt|t| + 5t^3,
+|| or i and TOO LARGE if f(a[i]) exceeds 400. The paper does not cover CPL;
+|| this is written as the documents of 1963 to 1966 write CPL.
+||
+|| The input, in tpk.in, is the paper's own example: 1 1.5 2 2.25 2.5 2.75
+|| 3 3.25 3.5 4.5 5.5.
+||
+|| Changes from the ALGOL, besides the character set:
+|| - The array is made by a call of Newarray (Elementary Programming
+||   Manual 15) and named A, as the manual names the coefficient array of
+||   its section 22, which also runs from 0 to 10.
+|| - f is a let definition, its parameter real because no type is given
+||   (Elementary Programming Manual 18; Main Features 17). abs is Mod and
+||   sqrt is Sqrt, the names of the manual's list of library functions
+||   (Elementary Programming Manual 4.4); the 1966 Reference Manual leaves
+||   its basic functions to an Appendix 3 that was never finished.
+|| - The descending cycle is step 10, -1, 0, as in Elementary Programming
+||   Manual 22; the ascending one is 0 to 10 (13.3).
+|| - y is defined at the head of the controlled block rather than declared
+||   in the outer block, as the manual defines its locals (section 14).
+|| - if ... else is a test-command (Elementary Programming Manual 10.4;
+||   Reference Manual 9.6.3).
+|| - Read and Write are the routines of the supplement for the pre-pilot
+||   system. The 1966 Reference Manual has no input and output: its
+||   section 1.4 was "postponed". The supplement's WRITE printed reals in
+||   floating decimal to 7 figures; this system prints 12 significant
+||   figures instead.
+
+let A = Newarray[real, (0, 10)]
+let f[t] = Sqrt[Mod[t]] + 5t**3
+
+for i = 0 to 10 do Read[A[i]]
+for i = step 10, -1, 0 do
+   $( let y = f[A[i]]
+      test y > 400
+         then Write[i, ' TOO LARGE*n']
+         or Write[i, ' ', y, '*n'] $)

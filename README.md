@@ -33,7 +33,7 @@ the manual prints the first recursive call as `HCF m, n]`.
 
 - **New to CPL?** Start with the [tutorial](tutorial/01-introduction.md):
   19 chapters, from hello world to LH functions.
-- **Want something to run?** There are [73 example programs](#examples),
+- **Want something to run?** There are [74 example programs](#examples),
   nine of them taken from the documents of 1963 to 1966.
 - **Want the 1966 program?** [Appendix 1](appendix1/README.md): the one
   large CPL program in the documents, run here, slips and all.
@@ -375,6 +375,7 @@ And one that is not from the documents read here:
 | Program | |
 | --- | --- |
 | `product.cpl` | The Cartesian product attributed to Strachey, as usually quoted; not checked against a primary source |
+| `tpk.cpl` | Knuth and Trabb Pardo's TPK (1976), given there in ALGOL 60 and written here in the CPL of the Elementary Programming Manual; the 1966 Reference Manual alone cannot express it (no input or output, no basic functions) |
 
 One for each part of the language:
 
@@ -575,7 +576,7 @@ cargo test
 
 | | |
 | --- | --- |
-| `tests/programs.rs` | runs all 73 examples against their `.out` files (`CPL_BLESS=1` rewrites them), and 32 tests of single features: juxtaposition, the two kinds of function, type deduction, labels, recursion 50,000 deep, the bit functions, the output routines |
+| `tests/programs.rs` | runs all 74 examples against their `.out` files (`CPL_BLESS=1` rewrites them), and 32 tests of single features: juxtaposition, the two kinds of function, type deduction, labels, recursion 50,000 deep, the bit functions, the output routines |
 | `tests/tutorial.rs` | runs the 205 programs of the tutorial |
 | `python3 tutorial/build_dataset.py --check` | rebuilds the dataset from real runs and fails if `tutorial/dataset/cpl.jsonl` would change |
 | `tests/appendix1.rs` | runs the 1966 preprocessor on a sample and on itself, and checks each of the eleven corrections to it |
